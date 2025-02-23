@@ -1,17 +1,9 @@
-<script setup lang="ts">
-import Counter from "@/components/Counter.vue";
+<script setup>
+import Header from "@/components/Header.vue";
 </script>
 
 <template>
-  <main
-    class="flex flex-col justify-center items-center gap-8 h-screen pb-[20vh]"
-  >
-    <div class="flex items-start gap-3">
-      <h1 class="text-4xl text-stone-600">
-        Vue + Vite + Tailwind + Typescript
-      </h1>
-      <span class="text-stone-500 text-lg">template</span>
+    <div class="bg-gray-300 min-h-screen text-third">
+        <Header></Header>
     </div>
-    <Counter />
-  </main>
 </template>
