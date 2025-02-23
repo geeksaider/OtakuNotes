@@ -18,6 +18,6 @@ import MovingBtn from "@/components/MovingBtn.vue";
             <MovingBtn>Мой список</MovingBtn>
             <MovingBtn>Обзоры</MovingBtn>
         </div>
-        <div></div>
+        <div class="size-10 rounded-full bg-third"></div>
     </section>
 </template>

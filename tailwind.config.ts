@@ -8,6 +8,7 @@ export default {
                 first: "#E6E4D8 ",
                 second: "#8C6D51",
                 third: "#323843",
+                background: "#F9F9F9",
             },
         },
         fontFamily: {
