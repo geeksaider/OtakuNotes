@@ -3,7 +3,7 @@ import Header from "@/components/Header.vue";
 </script>
 
 <template>
-    <div class="bg-gray-300 min-h-screen text-third">
+    <div class="min-h-screen text-third bg-gray-100">
         <Header></Header>
     </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import Logo from "./SVG/logo.vue";
+import MovingBtn from "@/components/MovingBtn.vue";
 </script>
 
 <template>
@@ -17,5 +18,6 @@ import Logo from "./SVG/logo.vue";
             <MovingBtn>Мой список</MovingBtn>
             <MovingBtn>Обзоры</MovingBtn>
         </div>
+        <div></div>
     </section>
 </template>
