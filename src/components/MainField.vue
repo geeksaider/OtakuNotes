@@ -3,6 +3,7 @@ import SearchInput from "./SearchInput.vue";
 import TextHeader from "./TextHeader.vue";
 import PresentBanner from "./PresentBanner.vue";
 import AnimeBanner from "@/components/AnimeBanner.vue";
+import Button from "@/components/Button.vue";
 </script>
 
 <template>

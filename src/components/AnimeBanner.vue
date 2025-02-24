@@ -19,7 +19,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section v-if="selectedAnime" class="flex flex-col gap-4 mb-12 max-w-60">
+  <section v-if="selectedAnime" class="flex flex-col gap-4 max-w-60">
     <div class="relative">
       <img
         :src="titleImage"

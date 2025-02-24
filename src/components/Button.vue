@@ -1,4 +1,8 @@
 <script setup lang="ts"></script>
 <template>
-  <button>Зарегестрироваться</button>
+  <button
+    class="bg-white px-4 w-fit text-center mx-auto py-2 rounded-lg text-lg ring ring-first font-semibold hover:brightness-95"
+  >
+    Зарегистрироваться
+  </button>
 </template>
