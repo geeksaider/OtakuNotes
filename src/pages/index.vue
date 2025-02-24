@@ -1,7 +1,7 @@
 <script setup>
 import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
-import AnimeBanner from "@/components/AnimeBanner.vue";
+
 </script>
 
 <template>
@@ -9,7 +9,7 @@ import AnimeBanner from "@/components/AnimeBanner.vue";
     <Header></Header>
     <div class="bg-background">
       <MainField></MainField>
-      <AnimeBanner></AnimeBanner>
+     
     </div>
   </div>
 </template>
