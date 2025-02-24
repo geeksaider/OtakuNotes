@@ -5,9 +5,9 @@ interface Props {
   titleIamge: string;
 }
 
-const titleImage = ref();
+const titleImage = ref<string>();
 
-const selectedAnime = ref<ProfileInfo>();
+const selectedAnime = ref();
 
 onMounted(async () => {
   const response = await fetch("https://api.jikan.moe/v4/anime/1");
