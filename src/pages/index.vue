@@ -15,7 +15,7 @@ const query = ref<string>("");
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
         <SearchInput class="justify-center" v-model="query"></SearchInput>
         <MainField v-if="query == ''"></MainField>
-        <CardField :query="query"></CardField>
+        <CardField v-else :query="query"></CardField>
       </div>
     </div>
     <Header></Header>
