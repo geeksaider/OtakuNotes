@@ -1,31 +1,25 @@
-<script setup lang="ts">
-import { defineProps, onMounted, ref } from "vue";
+<script setup>
+import { defineProps } from "vue";
 
-interface Props {
-  titleIamge: string;
-}
+const { selectedAnime } = defineProps(["selectedAnime"]);
 
-const titleImage = ref<string>();
-
-const selectedAnime = ref();
-
-onMounted(async () => {
-  const response = await fetch("https://api.jikan.moe/v4/anime/1");
-  selectedAnime.value = await response.json();
-  selectedAnime.value
-    ? (titleImage.value = selectedAnime.value.data.images.webp.image_url)
-    : "";
-});
+console.log(selectedAnime);
 </script>
 
 <template>
   <section v-if="selectedAnime" class="flex flex-col gap-4 max-w-60">
     <div class="relative">
       <img
-        :src="titleImage"
+        :src="
+          'webp' in selectedAnime.images
+            ? selectedAnime.images.webp.image_url
+            : ''
+        "
         :alt="
-          selectedAnime.data.titles.find((title) => title.type == 'English')
-            .title
+          selectedAnime.titles.find((title) => title.type == 'English')
+            ? selectedAnime.titles.find((title) => title.type == 'English')
+                .title
+            : selectedAnime.titles[0].title
         "
         class="rounded-lg shadow-sm shadow-third"
       />
@@ -33,7 +27,7 @@ onMounted(async () => {
         <span
           class="bg-black opacity-80 px-3 py-px rounded-2xl items-center text-white font-bold text-xl"
         >
-          {{ selectedAnime.data.score }}
+          {{ selectedAnime.score }}
         </span>
       </div>
     </div>
@@ -41,14 +35,16 @@ onMounted(async () => {
     <div class="bg-white flex flex-col rounded-lg shadow-md py-2 px-4">
       <h1 class="text-xl font-bold">
         {{
-          selectedAnime.data.titles.find((title) => title.type == "English")
-            .title
+          selectedAnime.titles.find((title) => title.type == "English")
+            ? selectedAnime.titles.find((title) => title.type == "English")
+                .title
+            : selectedAnime.titles[0].title
         }}
       </h1>
       <p>
-        {{ selectedAnime.data.type == "TV" ? "TV сериал" : "Фильм" }}
+        {{ selectedAnime.type == "TV" ? "TV сериал" : "Фильм" }}
       </p>
-      <p class="text-third/80 font-semibold">{{ selectedAnime.data.year }}</p>
+      <p class="text-third/80 font-semibold">{{ selectedAnime.year }}</p>
     </div>
   </section>
 </template>
