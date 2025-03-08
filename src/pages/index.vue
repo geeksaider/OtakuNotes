@@ -4,7 +4,7 @@ import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import AnimeBanner from "@/components/AnimeBanner.vue";
 import Pagination from "@/components/Pagination.vue";
-import { ref, watch } from "vue";
+import { ref, watch, Transition } from "vue";
 
 const animeList = ref([]);
 const loading = ref<boolean>(false);
@@ -39,6 +39,11 @@ watch(query, (value: string) => {
 });
 
 const changePage = (page: number) => {
+    window.scrollTo({
+        top: 100,
+        left: 100,
+        behavior: "smooth",
+    });
     currentPage.value = page;
     fetchData(query.value, page);
 };
@@ -50,14 +55,24 @@ const changePage = (page: number) => {
         <div class="bg-background flex-grow pb-20">
             <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
                 <SearchInput class="justify-center" v-model="query" />
-                <MainField v-if="query == ''" />
 
-                <section class="grid grid-cols-4 gap-12" v-if="!loading">
-                    <AnimeBanner
-                        v-for="anime in animeList"
-                        :selected-anime="anime"
-                    />
-                </section>
+                <Pagination
+                    v-if="animeList.length > 0"
+                    :currentPage="currentPage"
+                    :lastPage="lastPage"
+                    @pageChange="changePage"
+                />
+
+                <MainField v-if="query == ''" />
+                <Transition name="fade" v-if="!loading">
+                    <div class="grid grid-cols-4 gap-12">
+                        <AnimeBanner
+                            v-for="anime in animeList"
+                            :selected-anime="anime"
+                            class="transition-all"
+                        />
+                    </div>
+                </Transition>
 
                 <section v-else class="flex justify-center items-center">
                     <svg
@@ -90,3 +105,17 @@ const changePage = (page: number) => {
         <Header />
     </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition:
+        transform 0.5s ease,
+        opacity 0.5s ease;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+    opacity: 0;
+    transform: scale(0.95);
+}
+</style>

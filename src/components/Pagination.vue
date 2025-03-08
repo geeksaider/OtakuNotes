@@ -11,7 +11,7 @@ const emit = defineEmits(["pageChange"]);
 
 const visiblePages = computed(() => {
     const pages: number[] = [];
-    const maxVisible: number = 5;
+    const maxVisible: number = 3;
 
     let start = Math.max(1, props.currentPage - Math.floor(maxVisible / 2));
     let end = Math.min(props.lastPage, start + maxVisible - 1);
@@ -29,15 +29,15 @@ const visiblePages = computed(() => {
 
 <template>
     <div
-        class="flex gap-4 items-center justify-center mt-6 bg-third/90 w-fit mx-auto rounded-full transition-all text-lg font-logo overflow-hidden p-2 shadow-lg shadow-black/40"
+        class="flex gap-4 items-center justify-center bg-white ring-inset ring-2 ring-first text-second focus:outline-none focus:ring-second w-fit mx-auto rounded-full transition-all text-lg font-logo overflow-hidden px-2 py-1"
         v-if="lastPage != 1"
     >
         <ArrowChevron
             :class="[
-                'rotate-180 bg-third text-white size-10 p-2 rounded-full transition-all',
+                'rotate-180 bg-second/60 size-10 p-2 rounded-full transition-all',
                 currentPage === 1
                     ? 'opacity-30 pointer-events-none'
-                    : 'hover:bg-third/80 cursor-pointer active:scale-90',
+                    : 'hover:bg-second/80 cursor-pointer active:scale-90',
             ]"
             @click="emit('pageChange', currentPage - 1)"
         />
@@ -45,24 +45,22 @@ const visiblePages = computed(() => {
         <button
             v-if="visiblePages[0] > 1"
             @click="emit('pageChange', 1)"
-            class="text-white hover:bg-third/70 w-10 h-10 rounded-md transition-all text-lg"
+            class="hover:bg-first w-10 h-10 rounded-full transition-all text-lg"
         >
             1
         </button>
 
-        <span v-if="visiblePages[0] > 2" class="text-white font-bold text-lg"
-            >...</span
-        >
+        <span v-if="visiblePages[0] > 2" class="font-bold text-lg">...</span>
 
         <div class="flex gap-2 py-1">
             <button
                 v-for="page in visiblePages"
                 @click="emit('pageChange', page)"
-                class="text-white shadow-md w-10 h-10 transition-all duration-300 text-lg"
+                class="text-white shadow-md w-10 h-10 rounded-full transition-all duration-300 text-lg"
                 :class="[
                     page === currentPage
-                        ? 'font-bold bg-third text-white rounded-full  shadow-lg scale-110'
-                        : 'bg-third/40 hover:bg-third/60 rounded-md hover:scale-105',
+                        ? 'font-bold bg-second/60 shadow-lg scale-110'
+                        : 'bg-second/40 hover:bg-second/60 hover:scale-105',
                 ]"
             >
                 {{ page }}
@@ -71,13 +69,13 @@ const visiblePages = computed(() => {
 
         <span
             v-if="visiblePages[visiblePages.length - 1] < lastPage - 1"
-            class="text-white font-bold text-lg"
+            class="e font-bold text-lg"
             >...</span
         >
 
         <button
             v-if="visiblePages[visiblePages.length - 1] < lastPage"
-            class="text-white hover:bg-third/70 w-10 h-10 rounded-md transition-all text-lg"
+            class="hover:bg-first w-10 h-10 rounded-full transition-all text-lg"
             @click="emit('pageChange', lastPage)"
         >
             {{ lastPage }}
@@ -85,10 +83,10 @@ const visiblePages = computed(() => {
 
         <ArrowChevron
             :class="[
-                'bg-third/80 text-white size-10 p-2 rounded-full transition-all',
+                ' bg-second/60 size-10 p-2 rounded-full transition-all',
                 currentPage === lastPage
                     ? 'opacity-30 pointer-events-none'
-                    : 'hover:bg-third/60 cursor-pointer active:scale-90',
+                    : 'hover:bg-second/80 cursor-pointer active:scale-90',
             ]"
             @click="emit('pageChange', currentPage + 1)"
         />
