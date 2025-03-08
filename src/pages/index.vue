@@ -3,24 +3,28 @@ import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import AnimeBanner from "@/components/AnimeBanner.vue";
+import Pagination from "@/components/Pagination.vue";
 import { ref, watch } from "vue";
 
-const animeList = ref();
+const animeList = ref([]);
 const loading = ref<boolean>(false);
 const query = ref<string>("");
+const currentPage = ref<number>(1);
+const lastPage = ref<number>(1);
 
-const fetchData = async (currentQuery: string) => {
+const fetchData = async (currentQuery: string, page: number = 1) => {
     if (!currentQuery) return;
 
     try {
         const response = await fetch(
-            `https://api.jikan.moe/v4/anime?q=${currentQuery}`
+            `https://api.jikan.moe/v4/anime?q=${currentQuery}&page=${page}`
         );
         if (!response.ok) {
             throw new Error("Ошибка сети");
         }
         const json = await response.json();
         animeList.value = json.data;
+        lastPage.value = json.pagination.last_visible_page;
     } catch (error) {
         console.warn("Ошибка при поиске:", error);
     } finally {
@@ -28,17 +32,16 @@ const fetchData = async (currentQuery: string) => {
     }
 };
 
-let updateTimer: number = 0;
-
-watch(query, (value) => {
+watch(query, (value: string) => {
     loading.value = true;
-    if (updateTimer) {
-        clearTimeout(updateTimer);
-    }
-    updateTimer = setTimeout(() => {
-        fetchData(value);
-    }, 600);
+    currentPage.value = 1;
+    fetchData(value, 1);
 });
+
+const changePage = (page: number) => {
+    currentPage.value = page;
+    fetchData(query.value, page);
+};
 </script>
 
 <template>
@@ -55,6 +58,7 @@ watch(query, (value) => {
                         :selected-anime="anime"
                     />
                 </section>
+
                 <section v-else class="flex justify-center items-center">
                     <svg
                         class="mr-3 -ml-1 size-9 animate-spin fill-third"
@@ -69,11 +73,18 @@ watch(query, (value) => {
                             r="12"
                         ></circle>
                         <path
-                            class="opacity-65"
+                            class="opacity-45"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                     </svg>
                 </section>
+
+                <Pagination
+                    v-if="animeList.length > 0"
+                    :currentPage="currentPage"
+                    :lastPage="lastPage"
+                    @pageChange="changePage"
+                />
             </div>
         </div>
         <Header />
