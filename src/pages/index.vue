@@ -4,6 +4,8 @@ import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import AnimeBanner from "@/components/AnimeBanner.vue";
 import Pagination from "@/components/Pagination.vue";
+import FilterList from "@/components/FilterList.vue";
+import FilterButton from "@/components/FilterButton.vue";
 import { ref, watch, Transition } from "vue";
 
 interface Anime {
@@ -21,21 +23,20 @@ const loading = ref<boolean>(false);
 const query = ref<string>("");
 const currentPage = ref<number>(1);
 const lastPage = ref<number>(1);
+const showFilters = ref<boolean>(false);
 
 const fetchData = async (currentQuery: string, page: number = 1) => {
     if (!currentQuery) return;
 
     try {
         const response = await fetch(
-            `https://api.jikan.moe/v4/anime?q=${currentQuery}&page=${page}`
+            `https://api.jikan.moe/v4/anime?order_by=popularity&sort=asc&q=${currentQuery}&page=${page}`
         );
         if (!response.ok) {
             throw new Error("Ошибка сети");
         }
         const json = await response.json();
-        animeList.value = (json.data as Anime[])
-            .filter((anime) => anime.scored_by)
-            .sort((a, b) => b.scored_by - a.scored_by);
+        animeList.value = json.data;
         lastPage.value = json.pagination.last_visible_page;
     } catch (error) {
         console.warn("Ошибка при поиске:", error);
@@ -63,11 +64,27 @@ const changePage = (page: number) => {
 </script>
 
 <template>
-    <div class="min-h-[101vh] text-third flex flex-col">
+    <div
+        class="min-h-[101vh] text-third flex flex-col"
+        @click="showFilters = false"
+    >
         <Header />
         <div class="bg-background flex-grow pb-20">
             <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
-                <SearchInput class="justify-center" v-model="query" />
+                <section class="flex gap-2 justify-center items-center">
+                    <SearchInput class="justify-center" v-model="query" />
+                    <div class="relative">
+                        <FilterButton
+                            @click.stop
+                            @click="showFilters = !showFilters"
+                        ></FilterButton>
+                        <FilterList
+                            :showFilters="showFilters"
+                            @click.stop
+                            @apply="showFilters = false"
+                        ></FilterList>
+                    </div>
+                </section>
 
                 <Pagination
                     v-if="animeList.length > 0 && query != ''"
