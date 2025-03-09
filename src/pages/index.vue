@@ -6,7 +6,17 @@ import AnimeBanner from "@/components/AnimeBanner.vue";
 import Pagination from "@/components/Pagination.vue";
 import { ref, watch, Transition } from "vue";
 
-const animeList = ref([]);
+interface Anime {
+    score: number;
+    scored_by: number;
+    type: string;
+    year: number;
+    titles: { type: string; title: string }[];
+    images: {
+        webp?: { image_url: string };
+    };
+}
+const animeList = ref<Anime[]>([]);
 const loading = ref<boolean>(false);
 const query = ref<string>("");
 const currentPage = ref<number>(1);
@@ -23,7 +33,9 @@ const fetchData = async (currentQuery: string, page: number = 1) => {
             throw new Error("Ошибка сети");
         }
         const json = await response.json();
-        animeList.value = json.data;
+        animeList.value = (json.data as Anime[])
+            .filter((anime) => anime.scored_by)
+            .sort((a, b) => b.scored_by - a.scored_by);
         lastPage.value = json.pagination.last_visible_page;
     } catch (error) {
         console.warn("Ошибка при поиске:", error);
@@ -39,6 +51,7 @@ watch(query, (value: string) => {
 });
 
 const changePage = (page: number) => {
+    loading.value = true;
     window.scrollTo({
         top: 100,
         left: 100,
@@ -57,24 +70,30 @@ const changePage = (page: number) => {
                 <SearchInput class="justify-center" v-model="query" />
 
                 <Pagination
-                    v-if="animeList.length > 0"
+                    v-if="animeList.length > 0 && query != ''"
                     :currentPage="currentPage"
                     :lastPage="lastPage"
                     @pageChange="changePage"
                 />
 
                 <MainField v-if="query == ''" />
-                <Transition name="fade" v-if="!loading">
-                    <div class="grid grid-cols-4 gap-12">
+
+                <Transition name="fade">
+                    <div
+                        v-if="!loading && query != ''"
+                        class="grid grid-cols-4 gap-12 justify-center min-h-screen"
+                    >
                         <AnimeBanner
                             v-for="anime in animeList"
                             :selected-anime="anime"
-                            class="transition-all"
                         />
                     </div>
                 </Transition>
 
-                <section v-else class="flex justify-center items-center">
+                <section
+                    v-if="loading && query != ''"
+                    class="flex justify-center min-h-screen"
+                >
                     <svg
                         class="mr-3 -ml-1 size-9 animate-spin fill-third"
                         xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +114,7 @@ const changePage = (page: number) => {
                 </section>
 
                 <Pagination
-                    v-if="animeList.length > 0"
+                    v-if="animeList.length > 0 && query != '' && !loading"
                     :currentPage="currentPage"
                     :lastPage="lastPage"
                     @pageChange="changePage"
@@ -106,16 +125,14 @@ const changePage = (page: number) => {
     </div>
 </template>
 
-<style scoped>
+<style>
 .fade-enter-active,
 .fade-leave-active {
-    transition:
-        transform 0.5s ease,
-        opacity 0.5s ease;
+    transition: opacity 0.7s ease;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.fade-enter-from,
+.fade-leave-to {
     opacity: 0;
-    transform: scale(0.95);
 }
 </style>
