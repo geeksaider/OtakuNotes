@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch, Transition, onMounted } from "vue";
 import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
@@ -6,7 +7,6 @@ import AnimeBanner from "@/components/AnimeBanner.vue";
 import Pagination from "@/components/Pagination.vue";
 import FilterList from "@/components/FilterList.vue";
 import FilterButton from "@/components/FilterButton.vue";
-import { ref, watch, Transition, onMounted } from "vue";
 
 interface Anime {
     score: number;
@@ -131,12 +131,12 @@ function apply(type?: string, age?: string, year?: number, minRating?: number) {
                             @mousedown.stop
                             @click="showFilters = !showFilters"
                             :active="showFilters"
-                        ></FilterButton>
+                        />
                         <FilterList
                             :showFilters="showFilters"
                             @mousedown.stop
                             @apply="apply"
-                        ></FilterList>
+                        />
                     </div>
                 </section>
 
