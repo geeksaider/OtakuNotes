@@ -137,9 +137,14 @@ function apply(type?: string, year?: number, minRating?: number) {
         <Transition name="fade">
           <div
             v-if="!loading && query != ''"
-            class="grid grid-cols-4 gap-12 justify-center min-h-screen"
+            class="grid grid-cols-4 gap-6 justify-center min-h-screen"
           >
-            <AnimeBanner v-for="anime in animeList" :selected-anime="anime" />
+            <div v-for="n in 4" class="flex flex-col gap-16">
+              <AnimeBanner
+                v-for="anime in animeList.filter((_, i) => (i % 4) + 1 == n)"
+                :selected-anime="anime"
+              />
+            </div>
           </div>
         </Transition>
 
