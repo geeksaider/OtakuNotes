@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { useAnime } from "@/composables/useAnime";
+import { useAnimeList } from "@/composables/useAnimeList";
+import { usePagination } from "@/composables/usePagination";
+import { useFilters } from "@/composables/useFilters";
+import { useGrid } from "@/composables/useGrid";
+
 import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
@@ -9,17 +13,18 @@ import FilterList from "@/components/FilterList.vue";
 import FilterButton from "@/components/FilterButton.vue";
 import ContentTemplate from "@/components/ContentTemplate.vue";
 
-const {
-    animeList,
-    loading,
+const { showFilters, param, safetySearch, apply } = useFilters();
+const { animeList, loading, query, lastPage, fetchData } = useAnimeList(
+    safetySearch,
+    param
+);
+const { currentPage, changePage } = usePagination(
     query,
-    currentPage,
-    lastPage,
-    showFilters,
-    gridColsNum,
-    changePage,
-    apply,
-} = useAnime();
+    param,
+    fetchData,
+    lastPage
+);
+const { gridColsNum } = useGrid();
 </script>
 
 <template>
