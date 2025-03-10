@@ -34,7 +34,9 @@ const fetchData = async (
 
   try {
     const response = await fetch(
-      `https://api.jikan.moe/v4/anime?order_by=popularity&sort=desc&q=${currentQuery}&page=${page}&${param} `
+      `https://api.jikan.moe/v4/anime?order_by=popularity&sort=desc&q=${currentQuery}&page=${page}${
+        !param ? "" : param
+      } `
     );
     if (!response.ok) {
       throw new Error("Ошибка сети");
@@ -90,7 +92,7 @@ const changePage = (page: number) => {
 function apply(type?: string, year?: number, minRating?: number) {
   const filter = [
     type ? `&type=${type}` : "",
-    year ? `&start_date=${year}` : "",
+    year ? `&start_date=${year}-01-01&end_date=${year}-12-31` : "",
     minRating ? `&min_score=${minRating}` : "",
   ];
   showFilters.value = false;
