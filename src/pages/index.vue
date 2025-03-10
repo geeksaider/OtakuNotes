@@ -54,7 +54,9 @@ let waitResponse: number | undefined = undefined;
 watch([query, param], ([value, param]: (string | undefined)[]) => {
   loading.value = true;
   currentPage.value = 1;
+
   clearTimeout(waitResponse);
+
   if (waitResponse) {
     clearTimeout(waitResponse);
     waitResponse = setTimeout(async () => {
