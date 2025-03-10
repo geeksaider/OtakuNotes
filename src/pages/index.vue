@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, Transition, onMounted } from "vue";
+import { useAnime } from "@/composables/useAnime";
 import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
 import SearchInput from "@/components/SearchInput.vue";
@@ -7,113 +7,19 @@ import AnimeBanner from "@/components/AnimeBanner.vue";
 import Pagination from "@/components/Pagination.vue";
 import FilterList from "@/components/FilterList.vue";
 import FilterButton from "@/components/FilterButton.vue";
+import ContentTemplate from "@/components/ContentTemplate.vue";
 
-interface Anime {
-    score: number;
-    type: string;
-    year: number;
-    titles: { type: string; title: string }[];
-    images: {
-        webp?: { image_url: string };
-    };
-}
-const animeList = ref<Anime[]>([]);
-const loading = ref<boolean>(false);
-const query = ref<string>("");
-const currentPage = ref<number>(1);
-const lastPage = ref<number>(1);
-const showFilters = ref<boolean>(false);
-const param = ref<string | undefined>(undefined);
-const gridColsNum = ref<number>(0);
-const safetySearch = ref<boolean>(true);
-
-function calcGridCols() {
-    if (window.innerWidth > 1024) gridColsNum.value = 4;
-    else if (window.innerWidth > 768) gridColsNum.value = 3;
-    else gridColsNum.value = 2;
-}
-
-onMounted(() => {
-    window.addEventListener("resize", calcGridCols);
-    calcGridCols();
-});
-
-const fetchData = async (
-    currentQuery: string,
-    page: number = 1,
-    param?: string
-) => {
-    if (!currentQuery) return;
-
-    try {
-        const response = await fetch(
-            `https://api.jikan.moe/v4/anime?order_by=popularity&sort=desc&q=${currentQuery}&page=${page}${
-                !param ? "" : param
-            }&sfw=${safetySearch.value} `
-        );
-        if (!response.ok) {
-            throw new Error("Ошибка сети");
-        }
-        const json = await response.json();
-        animeList.value = json.data;
-        lastPage.value = json.pagination.last_visible_page;
-    } catch (error) {
-        console.warn("Ошибка при поиске:", error);
-    } finally {
-        loading.value = false;
-    }
-};
-
-let waitResponse: number | undefined = undefined;
-
-watch([query, param], ([value, param]: (string | undefined)[]) => {
-    loading.value = true;
-    currentPage.value = 1;
-
-    clearTimeout(waitResponse);
-
-    if (waitResponse) {
-        clearTimeout(waitResponse);
-        waitResponse = setTimeout(async () => {
-            await fetchData(value!, 1, param);
-            waitResponse = undefined;
-        }, 500);
-    } else {
-        fetchData(value!, 1, param);
-    }
-});
-
-const changePage = (page: number) => {
-    loading.value = true;
-    window.scrollTo({
-        top: 100,
-        behavior: "smooth",
-    });
-    currentPage.value = page;
-    if (waitResponse) {
-        clearTimeout(waitResponse);
-        waitResponse = undefined;
-        waitResponse = setTimeout(async () => {
-            await fetchData(query.value, page, param.value);
-            waitResponse = undefined;
-        }, 500);
-    } else {
-        fetchData(query.value, page, param.value);
-    }
-};
-
-function apply(type?: string, age?: string, year?: number, minRating?: number) {
-    age == "rx" ? (safetySearch.value = false) : (safetySearch.value = true);
-    const filter = [
-        type ? `&type=${type}` : "",
-        age ? `&rating=${age}` : "",
-        year ? `&start_date=${year}-01-01&end_date=${year}-12-31` : "",
-        minRating ? `&min_score=${minRating}` : "",
-    ];
-    showFilters.value = false;
-
-    param.value = filter.join("");
-}
+const {
+    animeList,
+    loading,
+    query,
+    currentPage,
+    lastPage,
+    showFilters,
+    gridColsNum,
+    changePage,
+    apply,
+} = useAnime();
 </script>
 
 <template>
@@ -122,7 +28,7 @@ function apply(type?: string, age?: string, year?: number, minRating?: number) {
         @mousedown="showFilters = false"
     >
         <Header />
-        <div class="bg-background flex-grow pb-20">
+        <ContentTemplate class="bg-background flex-grow pb-20">
             <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
                 <section class="flex gap-2 justify-center items-center">
                     <SearchInput class="justify-center" v-model="query" />
@@ -201,7 +107,7 @@ function apply(type?: string, age?: string, year?: number, minRating?: number) {
                     @pageChange="changePage"
                 />
             </div>
-        </div>
+        </ContentTemplate>
         <Header />
     </div>
 </template>

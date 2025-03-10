@@ -46,7 +46,7 @@ const validateSelectedYear = () => {
                 <option :value="undefined">Все</option>
                 <option value="g">G - All Ages</option>
                 <option value="pg">PG - Дети</option>
-                <option value="pg13 ">PG-13 - Подростки > 13</option>
+                <option value="pg13">PG-13 - Подростки > 13</option>
                 <option value="r17">R - 17+</option>
                 <option value="r">R+ - Mild Nudity</option>
                 <option value="rx">Rx - Hentai</option>
