@@ -23,13 +23,18 @@ const query = ref<string>("");
 const currentPage = ref<number>(1);
 const lastPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
+const param = ref<string | undefined>(undefined);
 
-const fetchData = async (currentQuery: string, page: number = 1) => {
+const fetchData = async (
+  currentQuery: string,
+  page: number = 1,
+  param?: string
+) => {
   if (!currentQuery) return;
 
   try {
     const response = await fetch(
-      `https://api.jikan.moe/v4/anime?order_by=popularity&sort=desc&q=${currentQuery}&page=${page}&rating=g `
+      `https://api.jikan.moe/v4/anime?order_by=popularity&sort=desc&q=${currentQuery}&page=${page}&${param} `
     );
     if (!response.ok) {
       throw new Error("Ошибка сети");
@@ -44,20 +49,20 @@ const fetchData = async (currentQuery: string, page: number = 1) => {
   }
 };
 
-let waitResponse = undefined;
+let waitResponse: number | undefined = undefined;
 
-watch(query, (value: string) => {
+watch([query, param], ([value, param]: (string | undefined)[]) => {
   loading.value = true;
   currentPage.value = 1;
   clearTimeout(waitResponse);
   if (waitResponse) {
     clearTimeout(waitResponse);
     waitResponse = setTimeout(async () => {
-      await fetchData(value, 1);
+      await fetchData(value!, 1, param);
       waitResponse = undefined;
     }, 500);
   } else {
-    fetchData(value, 1);
+    fetchData(value!, 1, param);
   }
 });
 
@@ -72,13 +77,24 @@ const changePage = (page: number) => {
     clearTimeout(waitResponse);
     waitResponse = undefined;
     waitResponse = setTimeout(async () => {
-      await fetchData(query.value, page);
+      await fetchData(query.value, page, param.value);
       waitResponse = undefined;
     }, 500);
   } else {
-    fetchData(query.value, page);
+    fetchData(query.value, page, param.value);
   }
 };
+
+function apply(type?: string, year?: number, minRating?: number) {
+  const filter = [
+    type ? `&type=${type}` : "",
+    year ? `&start_date=${year}` : "",
+    minRating ? `&min_score=${minRating}` : "",
+  ];
+  showFilters.value = false;
+
+  param.value = filter.join("");
+}
 </script>
 
 <template>
@@ -100,7 +116,7 @@ const changePage = (page: number) => {
             <FilterList
               :showFilters="showFilters"
               @mousedown.stop
-              @apply="showFilters = false"
+              @apply="apply"
             ></FilterList>
           </div>
         </section>

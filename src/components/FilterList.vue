@@ -2,9 +2,9 @@
 import { ref, defineProps, defineEmits, watch } from "vue";
 
 const { showFilters } = defineProps<{ showFilters: boolean }>();
-const selectedType = ref<string>("");
-const type = ref<string>("");
-const selectedYear = ref<number>(undefined);
+const selectedType = ref<string | undefined>(undefined);
+const selectedYear = ref<number | undefined>(undefined);
+const selectedMinRating = ref<number | undefined>(undefined);
 const emit = defineEmits(["apply"]);
 
 const validateSelectedYear = () => {
@@ -26,12 +26,12 @@ const validateSelectedYear = () => {
       <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
       <label class="block font-bold text-sm">Тип:</label>
-      <select class="border rounded-lg p-2 w-full mb-3" v-model="type">
-        <option value="">Все</option>
-        <option value="&tv">TV</option>
-        <option value="&movie">Фильм</option>
-        <option value="&ova">OVA</option>
-        <option value="&special">Спецвыпуск</option>
+      <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedType">
+        <option :value="undefined">Все</option>
+        <option value="tv">TV</option>
+        <option value="movie">Фильм</option>
+        <option value="ova">OVA</option>
+        <option value="special">Спецвыпуск</option>
       </select>
 
       <label class="block font-bold text-sm">Год:</label>
@@ -53,11 +53,12 @@ const validateSelectedYear = () => {
         max="10"
         step="0.1"
         placeholder="От 0 до 10"
+        v-model="selectedMinRating"
       />
 
       <button
-        class="w-full bg-first text-white p-2 rounded-lg hover:bg-first/80 transition"
-        @click="emit('apply')"
+        class="w-full bg-second/90 text-white p-2 rounded-lg hover:bg-second transition"
+        @click="emit('apply', selectedType, selectedYear, selectedMinRating)"
       >
         Применить
       </button>
