@@ -1,11 +1,11 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/**/*", "src/**/*.vue"],
-  "compilerOptions": {
-    "composite": true,
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
+    "include": ["src/**/*", "src/**/*.vue"],
+    "compilerOptions": {
+        "composite": true,
 
-    "paths": {
-      "@/*": ["./src/*"]
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     }
-  }
 }

@@ -5,8 +5,8 @@ import Index from "./pages/index.vue";
 import "./main.css";
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes: [{ path: "/", component: Index }],
+    history: createWebHistory(),
+    routes: [{ path: "/", component: Index }],
 });
 
 createApp(RouterView).use(router).mount("body");
