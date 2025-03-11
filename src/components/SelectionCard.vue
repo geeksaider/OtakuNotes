@@ -11,7 +11,7 @@ const props = defineProps<{
 
 <template>
     <section
-        class="relative bg-white ring ring-first aspect-square w-72 justify-center flex rounded-lg cursor-pointer overflow-hidden transition-transform transform hover:scale-105 hover:shadow-lg"
+        class="relative bg-white ring-4 ring-first aspect-square w-72 justify-center flex rounded-lg cursor-pointer overflow-hidden transition-transform transform hover:scale-95 hover:shadow-lg hover:ring-second hover:ring-2"
     >
         <img
             :src="imageUrl"

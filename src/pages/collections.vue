@@ -9,6 +9,12 @@ const collections = ref<
     { title: string; imageUrl: string; route: string; titleCount: number }[]
 >([]);
 const loading = ref<boolean>(true);
+const TranslateSeason: string = {
+    winter: "Зима",
+    spring: "Весна",
+    fall: "Осень",
+    summer: "Лето",
+};
 
 const fetchCollections = async () => {
     try {
@@ -66,7 +72,7 @@ const fetchCollections = async () => {
                 if (seasonResponse.ok) {
                     const seasonJson = await seasonResponse.json();
                     collections.value.push({
-                        title: `Сезон ${season.charAt(0).toUpperCase() + season.slice(1)} ${year}`,
+                        title: `Сезон ${TranslateSeason[season]} ${year}`,
                         imageUrl: seasonJson.data[0].images.webp.image_url,
                         route: `/seasons/${year}/${season}`,
                         titleCount: seasonJson.pagination.items.total,
