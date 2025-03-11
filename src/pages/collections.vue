@@ -62,7 +62,7 @@ const fetchCollections = async () => {
         ];
 
         const currentYear = new Date().getFullYear();
-        for (let year = currentYear - 10; year <= currentYear; year++) {
+        for (let year = currentYear; year >= currentYear - 10; year--) {
             const seasons = ["winter", "spring", "summer", "fall"];
             for (const season of seasons) {
                 await new Promise((resolve) => setTimeout(resolve, 1000));
