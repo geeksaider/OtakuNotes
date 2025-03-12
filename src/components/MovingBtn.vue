@@ -10,9 +10,10 @@ interface Props {
 const { link, exact = true } = defineProps<Props>();
 
 const route = useRoute();
-const isActive = computed(() => {
-  exact ? route.path === link : route.path.startsWith(link);
-});
+const isActive = computed(() => 
+  exact ? route.path === link : route.path.startsWith(link)
+);
+console.log(isActive.value);
 </script>
 
 <template>
