@@ -2,12 +2,14 @@
 import { defineProps } from "vue";
 
 const { selectedAnime } = defineProps(["selectedAnime"]);
+console.log(selectedAnime);
 </script>
 
 <template>
     <section v-if="selectedAnime" class="flex flex-col h-fit gap-4 max-w-60">
         <div class="relative flex justify-center">
             <img
+                v-if="selectedAnime.images && selectedAnime.images.webp"
                 :src="
                     'webp' in selectedAnime.images
                         ? selectedAnime.images.webp.image_url
