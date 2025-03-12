@@ -97,29 +97,22 @@ onMounted(() => {
     <ContentTemplate>
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
         <div class="flex gap-16 justify-center">
-          <collectionsMoving to="/collections">Рекоменадции</collectionsMoving>
-          <collectionsMoving to="/collections/all-time"
+          <collectionsMoving link="/collections"
+            >Рекоменадции</collectionsMoving
+          >
+          <collectionsMoving link="/collections/all-time"
             >Топ за все время</collectionsMoving
           >
-          <collectionsMoving to="/collections/season-time"
+          <collectionsMoving link="/collections/season-time"
             >Топ сезона</collectionsMoving
           >
         </div>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-        >
-          <SelectionCard
-            v-for="collection in collections"
-            :title="collection.title"
-            :imageUrl="collection.imageUrl"
-            :titleCount="collection.titleCount"
-            :route="collection.route"
-          />
-        </div>
+
         <section v-if="loading" class="flex justify-center min-h-screen">
           <Loading></Loading>
         </section>
       </div>
+      <router-views></router-views>
     </ContentTemplate>
     <Header />
   </div>

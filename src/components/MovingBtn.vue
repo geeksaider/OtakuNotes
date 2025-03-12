@@ -4,12 +4,15 @@ import { computed } from "vue";
 
 interface Props {
   link: string;
+  exact?: boolean;
 }
 
-const { link } = defineProps<Props>();
+const { link, exact = true } = defineProps<Props>();
 
 const route = useRoute();
-const isActive = computed(() => route.path === link);
+const isActive = computed(() => {
+  exact ? route.path === link : route.path.startsWith(link);
+});
 </script>
 
 <template>
