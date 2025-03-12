@@ -112,7 +112,7 @@ onMounted(() => {
           <Loading></Loading>
         </section>
       </div>
-      <router-views></router-views>
+      <router-view class="flex"></router-view>
     </ContentTemplate>
     <Header />
   </div>
