@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import { useCollections } from "@/composables/useCollections";
 import { usePagination } from "@/composables/usePagination";
 import { useFilters } from "@/composables/useFilters";
@@ -16,25 +16,27 @@ import ContentTemplate from "@/components/ContentTemplate.vue";
 import Loading from "@/components/Loading.vue";
 
 const { showFilters, param, safetySearch, apply } = useFilters();
-const { animeList, loading, lastPage, fetchCollections, query } = useCollections(
-  safetySearch
-);
-const { currentPage, changePage } = usePagination(
-  query,
-  param,
-  fetchCollections,
-  lastPage
-);
+const { animeList, loading, lastPage, fetchCollections, query } =
+  useCollections(safetySearch);
 const { gridColsNum } = useGrid();
+const currentPage = ref<number>(1);
 
 onMounted(() => {
   fetchCollections("search");
 });
 
+watch([query, param], () => {
+  currentPage.value = 1;
+});
 
-watch([query, param], ([value, param]) => {
-  fetchCollections("search", {currentQuery: value, param: param});
+watch([query, param, currentPage], ([value, param, page]) => {
+  window.scrollTo({ top: 100, behavior: "smooth" });
+  fetchCollections("search", {
+    currentQuery: value,
+    param: param,
+    page: page,
   });
+});
 </script>
 
 <template>
@@ -65,7 +67,7 @@ watch([query, param], ([value, param]) => {
           v-if="animeList.length > 0 && query != ''"
           :currentPage="currentPage"
           :lastPage="lastPage"
-          @pageChange="changePage"
+          @pageChange="(page) => (currentPage = page)"
         />
 
         <MainField v-if="query == ''" />
@@ -100,7 +102,7 @@ watch([query, param], ([value, param]) => {
           v-if="animeList.length > 0 && query != '' && !loading"
           :currentPage="currentPage"
           :lastPage="lastPage"
-          @pageChange="changePage"
+          @pageChange="(page) => (currentPage = page)"
         />
       </div>
     </ContentTemplate>
