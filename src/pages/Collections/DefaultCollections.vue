@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useCollections } from "@/composables/useCollections";
-import AnimeBanner from "@/components/AnimeBanner.vue";
-import Loading from "@/components/Loading.vue";
+// import { onMounted } from "vue";
+// import { useCollections } from "@/composables/useCollections";
+// import AnimeBanner from "@/components/AnimeBanner.vue";
+// import Loading from "@/components/Loading.vue";
 
-const { animeList, loading, fetchCollections } = useCollections();
+// const { animeList, loading, fetchCollections } = useCollections();
 
-onMounted(() => {
-    fetchCollections("recommendations");
-});
+// onMounted(() => {
+//     fetchCollections("recommendations");
+// });
 </script>
 
 <template>
-    <div
+  <!-- <div
         v-if="!loading"
         class="grid gap-12 grid-cols-4 justify-center mx-auto min-h-screen"
     >
@@ -20,5 +20,5 @@ onMounted(() => {
     </div>
     <section v-if="loading" class="flex justify-center min-h-screen">
         <Loading></Loading>
-    </section>
+    </section> -->
 </template>
