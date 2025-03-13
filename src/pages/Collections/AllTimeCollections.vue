@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useCollections } from "@/composables/useCollections";
+import { useFilters } from "@/composables/useFilters";
 import AnimeBanner from "@/components/AnimeBanner.vue";
 import Loading from "@/components/Loading.vue";
 
-const { animeList, loading, fetchCollections } = useCollections();
+const { showFilters, param, safetySearch, apply } = useFilters();
+const { animeList, loading, fetchCollections } = useCollections(safetySearch,param);
 
 onMounted(() => {
   fetchCollections("top");
