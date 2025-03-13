@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
-import { useCollections } from "@/composables/useCollections";
+import { useCollections } from "@/composables/useAPI";
 import { usePagination } from "@/composables/usePagination";
 import { useFilters } from "@/composables/useFilters";
 import { useGrid } from "@/composables/useGrid";

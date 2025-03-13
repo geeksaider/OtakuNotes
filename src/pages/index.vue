@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from "vue";
-import { useCollections } from "@/composables/useCollections";
-import { usePagination } from "@/composables/usePagination";
+import { useApi } from "@/composables/useAPI";
+import type { Anime } from "@/composables/anime"
 import { useFilters } from "@/composables/useFilters";
 import { useGrid } from "@/composables/useGrid";
 
@@ -16,26 +16,28 @@ import ContentTemplate from "@/components/ContentTemplate.vue";
 import Loading from "@/components/Loading.vue";
 
 const { showFilters, param, safetySearch, apply } = useFilters();
-const { animeList, loading, lastPage, fetchCollections, query } =
-  useCollections(safetySearch);
+const query =  ref<string>('')
+const isLoading = ref<boolean>(false);
+const animeList = ref<Anime[]>([]);
+const totalPages = ref<number>(0)
 const { gridColsNum } = useGrid();
 const currentPage = ref<number>(1);
-
-onMounted(() => {
-  fetchCollections("search");
-});
 
 watch([query, param], () => {
   currentPage.value = 1;
 });
 
-watch([query, param, currentPage], ([value, param, page]) => {
+watch([query, param, currentPage], () => {
   window.scrollTo({ top: 100, behavior: "smooth" });
-  fetchCollections("search", {
-    currentQuery: value,
-    param: param,
-    page: page,
-  });
+  useApi<Anime[]>("/anime", {  
+  queryParams: {
+    q: query.value,
+    sfw: safetySearch.value,
+  }
+}, isLoading).then(({data, body}) => {
+  animeList.value = data;
+  totalPages.value = body.pagination.lastPage
+});
 });
 </script>
 

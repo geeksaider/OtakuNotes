@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useCollections } from "@/composables/useCollections";
+import { useCollections } from "@/composables/useAPI";
 import AnimeBanner from "@/components/AnimeBanner.vue";
 import Loading from "@/components/Loading.vue";
 

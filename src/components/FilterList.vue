@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch } from "vue";
+import { ref, defineProps, defineEmits, watch, reactive } from "vue";
 
 const { showFilters } = defineProps<{ showFilters: boolean }>();
 const selectedType = ref<string | undefined>(undefined);
@@ -15,14 +15,20 @@ const validateSelectedYear = () => {
             1963
         );
 };
+
+const submit = () => emit("apply", selectedType.value,
+    selectedAge.value,
+    selectedYear.value,
+    selectedMinRating.value);
 </script>
 
 <template>
     <Transition name="change">
-        <div
+        <form
             v-if="showFilters"
             id="filter-modal"
             class="absolute top-14 right-0 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
+            @submit.prevent="submit"
         >
             <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
@@ -76,19 +82,11 @@ const validateSelectedYear = () => {
 
             <button
                 class="w-full bg-second/90 text-white p-2 rounded-lg hover:bg-second transition"
-                @click="
-                    emit(
-                        'apply',
-                        selectedType,
-                        selectedAge,
-                        selectedYear,
-                        selectedMinRating
-                    )
-                "
+                @click="submit"
             >
                 Применить
             </button>
-        </div>
+        </form>
     </Transition>
 </template>
 
