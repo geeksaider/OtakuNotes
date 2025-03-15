@@ -10,7 +10,6 @@ const { currentPage, totalPages } = defineProps<{
 const emit = defineEmits(["pageChange"]);
 
 const visiblePages = computed(() => {
-    console.log(totalPages);
     const pages: number[] = [];
     const maxVisible: number = 3;
 

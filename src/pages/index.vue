@@ -2,6 +2,7 @@
 import { watch, ref } from "vue";
 import { useApi } from "@/composables/useAPI";
 import type { Anime } from "@/composables/anime";
+import type { Filters } from "@/composables/filters";
 import { useGrid } from "@/composables/useGrid";
 
 import Header from "@/components/Header.vue";
@@ -20,33 +21,62 @@ const totalPages = ref<number>(0);
 const { gridColsNum } = useGrid();
 const currentPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
-const param = ref({});
-
-watch([query, param, showFilters], () => {
-    currentPage.value = 1;
+const param = ref<Filters>({
+    type: undefined,
+    age: undefined,
+    year: undefined,
+    minRating: undefined,
 });
 
-watch([query, param, currentPage], () => {
+const applyFilters = (selectedFilters: Filters) => {
+    Object.assign(param.value, selectedFilters);
+    showFilters.value = false;
+};
+
+const lastPagination = (page: number) => {
     window.scrollTo({ top: 100, behavior: "smooth" });
-    useApi<Anime[]>(
-        "/anime",
-        {
-            queryParams: {
-                q: query.value,
-                sfw: param.value.age == "rx" ? false : true,
-                page: currentPage.value,
-                rating: param.value.age ? param.value.age : "",
-                start_date: param.value.year ? `${param.value.year}-01-01` : "",
-                end_date: param.value.year ? `${param.value.year}-12-31` : "",
-                min_score: param.value.minRating ? param.value.minRating : "",
+    currentPage.value = page;
+};
+
+watch(
+    [query, param],
+    () => {
+        currentPage.value = 1;
+    },
+    { deep: true }
+);
+
+watch(
+    [query, param, currentPage],
+    () => {
+        useApi<Anime[]>(
+            "/anime",
+            {
+                queryParams: {
+                    q: query.value,
+                    sfw: param.value.age == "rx" ? false : true,
+                    page: currentPage.value,
+                    rating: param.value.age ? param.value.age : "",
+                    type: param.value.type ? param.value.type : "",
+                    start_date: param.value.year
+                        ? `${param.value.year}-01-01`
+                        : "",
+                    end_date: param.value.year
+                        ? `${param.value.year}-12-31`
+                        : "",
+                    min_score: param.value.minRating
+                        ? param.value.minRating
+                        : "",
+                },
             },
-        },
-        isLoading
-    ).then(({ data, body }) => {
-        animeList.value = data;
-        totalPages.value = body.pagination.last_visible_page;
-    });
-});
+            isLoading
+        ).then(({ data, body }) => {
+            animeList.value = data;
+            totalPages.value = body.pagination.last_visible_page;
+        });
+    },
+    { deep: true }
+);
 </script>
 
 <template>
@@ -63,12 +93,7 @@ watch([query, param, currentPage], () => {
                         :is-active="showFilters"
                         @mousedown.stop
                         @update-active="showFilters = !showFilters"
-                        @apply="
-                            (selectedFilters) => {
-                                param = selectedFilters;
-                                showFilters = false;
-                            }
-                        "
+                        @apply="applyFilters"
                     ></FiltersField>
                 </section>
 
@@ -111,10 +136,15 @@ watch([query, param, currentPage], () => {
                 </section>
 
                 <Pagination
-                    v-if="animeList.length > 0 && query != '' && !isLoading"
+                    v-if="animeList.length > 0 && query != ''"
                     :currentPage="currentPage"
                     :totalPages="totalPages"
-                    @pageChange="(page) => (currentPage = page)"
+                    :class="
+                        isLoading
+                            ? 'opacity-0 transition-all duration-300'
+                            : 'opacity-100'
+                    "
+                    @pageChange="lastPagination"
                 />
             </div>
         </ContentTemplate>

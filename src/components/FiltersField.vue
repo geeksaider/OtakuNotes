@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, defineEmits, reactive, defineProps } from "vue";
+import { defineEmits, reactive, defineProps } from "vue";
 import Filter from "./SVG/Filter.vue";
+import type { Filters } from "@/composables/filters";
 
 interface Props {
     isActive: boolean;
@@ -8,7 +9,7 @@ interface Props {
 
 const { isActive } = defineProps<Props>();
 const emit = defineEmits(["apply", "updateActive"]);
-const selectedFilters = reactive({
+const selectedFilters = reactive<Filters>({
     type: undefined,
     age: undefined,
     year: undefined,
@@ -77,7 +78,7 @@ const submit = () => emit("apply", selectedFilters);
                     class="border rounded-lg p-2 w-full mb-3"
                     placeholder="Введите год"
                     min="1963"
-                    :max="new Date().getFullYear()"
+                    :max="new Date().getFullYear() + 100"
                     @change="validateSelectedYear"
                     v-model="selectedFilters.year"
                 />
@@ -94,8 +95,8 @@ const submit = () => emit("apply", selectedFilters);
                 />
 
                 <button
+                    type="submit"
                     class="w-full bg-second/90 text-white p-2 rounded-lg hover:bg-second transition"
-                    @click="submit"
                 >
                     Применить
                 </button>
