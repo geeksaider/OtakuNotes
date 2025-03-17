@@ -16,7 +16,7 @@ const animeList = ref<Anime[]>([]);
 const totalPages = ref<number>(25);
 const currentPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
-const showSort = ref<boolean>(false)
+const filterPosition = ref<string>('default')
 
 const param = ref<Filters>({
     type: undefined,
@@ -58,8 +58,11 @@ watch(
                 },
             },
             isLoading
-        ).then(({ data }) => {
+        ).then(({ data, body }) => {
             animeList.value = data;
+            animeList.value.length <= 0 ? filterPosition.value = 'center' : 'default';
+            totalPages.value = body.pagination.last_visible_page > 25 ? 25 : body.pagination.last_visible_page
+            totalPages.value == 1 ? filterPosition.value = 'center' : 'default';
         });
     },
     { deep: true, immediate: true }
@@ -76,8 +79,8 @@ watch(
 
                     <Pagination :currentPage="currentPage" :totalPages="totalPages"
                         @pageChange="(page) => (currentPage = page)" />
-                    <FiltersField :is-active="showFilters" :filters-list="param" @mousedown.stop
-                        @update-active="showFilters = !showFilters; showSort = false" @apply="applyFilters">
+                    <FiltersField :is-active="showFilters" :filters-list="param" :position="filterPosition"
+                        @mousedown.stop @update-active="showFilters = !showFilters" @apply="applyFilters">
                     </FiltersField>
                 </section>
 

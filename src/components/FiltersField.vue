@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import { defineEmits, reactive, defineProps } from "vue";
 import Filter from "./SVG/Filter.vue";
+import Reset from "./SVG/Reset.vue"
 import type { Filters } from "@/composables/filters";
 
 interface Props {
     isActive: boolean;
     filtersList: Filters;
+    position: string;
 }
 
-const { isActive, filtersList } = defineProps<Props>();
+interface Position {
+    center: string,
+    left: string,
+    right: string
+    default: string
+}
+
+const { isActive, filtersList, position = 'default' } = defineProps<Props>();
 const emit = defineEmits(["apply", "updateActive"]);
 const selectedFilters = reactive<Filters>({
     ...filtersList
@@ -23,6 +32,13 @@ const validateSelectedYear = () => {
 };
 
 const submit = () => emit("apply", selectedFilters);
+
+const positionStyle = <Position>{
+    center: 'left-1/2 transform -translate-x-1/2',
+    left: 'left-0',
+    right: 'right-0',
+    default: 'right-0',
+}
 </script>
 
 <template>
@@ -34,8 +50,8 @@ const submit = () => emit("apply", selectedFilters);
         </button>
 
         <Transition name="change">
-            <form v-if="isActive" class="absolute top-14 right-0 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
-                @submit.prevent="submit">
+            <form v-if="isActive" class="absolute top-16  bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
+                :class="positionStyle[position]" @submit.prevent="submit">
                 <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
                 <div v-if="'type' in filtersList">
@@ -86,11 +102,15 @@ const submit = () => emit("apply", selectedFilters);
                         placeholder="От 0 до 10" v-model="selectedFilters.minRating" />
                 </div>
 
+                <div class="flex justify-center items-center gap-3 mt-4">
+                    <button type="submit"
+                        class=" basis-[85%] bg-second/90 text-white p-2 rounded-lg  hover:bg-second transition">
+                        Применить
+                    </button>
 
-                <button type="submit"
-                    class="w-full bg-second/90 text-white p-2 rounded-lg mt-4 hover:bg-second transition">
-                    Применить
-                </button>
+                    <Reset @click="reset" class="fill-second my-auto " />
+
+                </div>
             </form>
         </Transition>
     </section>

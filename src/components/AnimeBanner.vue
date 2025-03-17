@@ -15,9 +15,9 @@ const hidden = ref<boolean>(true);
           ? selectedAnime.titles.find((title) => title.type == 'English')
             .title
           : selectedAnime.titles[0].title
-          " class="rounded-lg shadow-sm shadow-third" />
+          " class="rounded-lg shadow-sm shadow-third select-none" />
       <div class="absolute flex bottom-1 right-4 group">
-        <span class="bg-black opacity-80 px-3 py-px rounded-2xl items-center text-white font-bold text-xl">
+        <span class="bg-black opacity-80 px-3 select-none py-px rounded-2xl items-center text-white font-bold text-xl">
           {{ selectedAnime.score ? selectedAnime.score : "-" }}
         </span>
       </div>

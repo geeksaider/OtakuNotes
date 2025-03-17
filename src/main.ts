@@ -26,7 +26,13 @@ const router = createRouter({
           name: "SeasonCollections",
           component: () => import("./pages/Collections/SeasonCollections.vue"),
         },
+        
       ],
+    },
+    {
+      path: "/anime/:id",
+      component: () => import("./pages/anime.vue"),
+      props: true,
     },
   ],
 });
