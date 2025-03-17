@@ -1,26 +1,27 @@
 <script setup lang="ts">
 import { defineEmits, reactive, defineProps } from "vue";
 import Filter from "./SVG/Filter.vue";
-import Reset from "./SVG/Reset.vue"
+import Reset from "./SVG/Reset.vue";
 import type { Filters } from "@/composables/filters";
 
+type Position = "center" | "left" | "right" | "default";
 interface Props {
     isActive: boolean;
     filtersList: Filters;
-    position: string;
+    position: Position;
 }
 
-interface Position {
-    center: string,
-    left: string,
-    right: string
-    default: string
-}
-
-const { isActive, filtersList, position = 'default' } = defineProps<Props>();
+const { isActive, filtersList, position = "default" } = defineProps<Props>();
 const emit = defineEmits(["apply", "updateActive"]);
+const submit = () => emit("apply", selectedFilters);
+const positionStyle: Record<Position, string> = {
+    center: "left-1/2 transform -translate-x-1/2",
+    left: "left-0",
+    right: "right-0",
+    default: "right-0",
+};
 const selectedFilters = reactive<Filters>({
-    ...filtersList
+    ...filtersList,
 });
 
 const validateSelectedYear = () => {
@@ -31,32 +32,39 @@ const validateSelectedYear = () => {
         );
 };
 
-const submit = () => emit("apply", selectedFilters);
-
-const positionStyle = <Position>{
-    center: 'left-1/2 transform -translate-x-1/2',
-    left: 'left-0',
-    right: 'right-0',
-    default: 'right-0',
-}
+const reset = () => {
+    for (let key in selectedFilters) {
+        selectedFilters[key] = undefined;
+    }
+};
 </script>
 
 <template>
     <section class="relative">
-        <button id="filter-button"
+        <button
+            id="filter-button"
             class="flex h-11 w-11 items-center justify-center rounded-full ring-2 shadow-md hover:bg-first/50 transition-all"
-            :class="isActive ? ' ring-second' : ' bg-white  ring-first'" @click="$emit('updateActive')">
+            :class="isActive ? ' ring-second' : ' bg-white  ring-first'"
+            @click="$emit('updateActive')"
+        >
             <Filter class="fill-second"></Filter>
         </button>
 
         <Transition name="change">
-            <form v-if="isActive" class="absolute top-16  bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
-                :class="positionStyle[position]" @submit.prevent="submit">
+            <form
+                v-if="isActive"
+                class="absolute top-16 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
+                :class="positionStyle[position]"
+                @submit.prevent="submit"
+            >
                 <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
                 <div v-if="'type' in filtersList">
                     <label class="font-bold text-sm">Тип:</label>
-                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.type">
+                    <select
+                        class="border rounded-lg p-2 w-full mb-3"
+                        v-model="selectedFilters.type"
+                    >
                         <option :value="undefined">Все</option>
                         <option value="tv">TV</option>
                         <option value="movie">Фильм</option>
@@ -67,7 +75,10 @@ const positionStyle = <Position>{
 
                 <div v-if="'age' in filtersList">
                     <label class="font-bold text-sm">Возраст:</label>
-                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.age">
+                    <select
+                        class="border rounded-lg p-2 w-full mb-3"
+                        v-model="selectedFilters.age"
+                    >
                         <option :value="undefined">Все</option>
                         <option value="g">G - All Ages</option>
                         <option value="pg">PG - Дети</option>
@@ -80,7 +91,10 @@ const positionStyle = <Position>{
 
                 <div v-if="'filter' in filtersList">
                     <label class="font-bold text-sm">Фильтрация:</label>
-                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.filter">
+                    <select
+                        class="border rounded-lg p-2 w-full mb-3"
+                        v-model="selectedFilters.filter"
+                    >
                         <option :value="undefined" selected>Все</option>
                         <option value="airing">Выходят</option>
                         <option value="upcoming">Ждем всей деревней</option>
@@ -91,25 +105,39 @@ const positionStyle = <Position>{
 
                 <div v-if="'year' in filtersList">
                     <label class="font-bold text-sm">Год:</label>
-                    <input type="number" class="border rounded-lg p-2 w-full mb-3" placeholder="Введите год" min="1963"
-                        :max="new Date().getFullYear() + 100" @change="validateSelectedYear"
-                        v-model="selectedFilters.year" />
+                    <input
+                        type="number"
+                        class="border rounded-lg p-2 w-full mb-3"
+                        placeholder="Введите год"
+                        min="1963"
+                        :max="new Date().getFullYear() + 100"
+                        @change="validateSelectedYear"
+                        v-model="selectedFilters.year"
+                    />
                 </div>
 
                 <div v-if="'minRating' in filtersList">
                     <label class="font-bold text-sm">Мин. рейтинг:</label>
-                    <input type="number" class="border rounded-lg p-2 w-full " min="0" max="10" step="0.1"
-                        placeholder="От 0 до 10" v-model="selectedFilters.minRating" />
+                    <input
+                        type="number"
+                        class="border rounded-lg p-2 w-full"
+                        min="0"
+                        max="10"
+                        step="0.1"
+                        placeholder="От 0 до 10"
+                        v-model="selectedFilters.minRating"
+                    />
                 </div>
 
                 <div class="flex justify-center items-center gap-3 mt-4">
-                    <button type="submit"
-                        class=" basis-[85%] bg-second/90 text-white p-2 rounded-lg  hover:bg-second transition">
+                    <button
+                        type="submit"
+                        class="basis-[85%] bg-second/90 text-white p-2 rounded-lg hover:bg-second transition"
+                    >
                         Применить
                     </button>
 
-                    <Reset @click="reset" class="fill-second my-auto " />
-
+                    <Reset @click="reset()" class="fill-second my-auto" />
                 </div>
             </form>
         </Transition>
