@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { watch, ref } from "vue";
 import { useApi } from "@/composables/useAPI";
+import { useGrid } from "@/composables/useGrid";
 import type { Anime } from "@/composables/anime";
 import type { Filters } from "@/composables/filters";
-import { useGrid } from "@/composables/useGrid";
 
 import Header from "@/components/Header.vue";
 import MainField from "@/components/MainField.vue";
@@ -82,43 +82,74 @@ watch(
 </script>
 
 <template>
-    <div class="min-h-[101vh] text-third flex flex-col" @mousedown="showFilters = false">
+    <div
+        class="min-h-[101vh] text-third flex flex-col"
+        @mousedown="showFilters = false"
+    >
         <Header />
         <ContentTemplate class="bg-background flex-grow pb-20">
             <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
                 <section class="flex gap-2 justify-center items-center">
                     <SearchInput class="justify-center" v-model="query" />
-                    <FiltersField :is-active="showFilters" :filters-list="param" @mousedown.stop
-                        @update-active="showFilters = !showFilters" @apply="applyFilters"></FiltersField>
+                    <FiltersField
+                        :is-active="showFilters"
+                        :filters-list="param"
+                        position="default"
+                        @mousedown.stop
+                        @update-active="showFilters = !showFilters"
+                        @apply="applyFilters"
+                    ></FiltersField>
                 </section>
 
-                <Pagination v-if="animeList.length > 0 && query != ''" :currentPage="currentPage"
-                    :totalPages="totalPages" @pageChange="(page) => (currentPage = page)" />
+                <Pagination
+                    v-if="animeList.length > 0 && query != ''"
+                    :currentPage="currentPage"
+                    :totalPages="totalPages"
+                    @pageChange="(page) => (currentPage = page)"
+                />
 
                 <MainField v-if="query == ''" />
 
                 <Transition name="fade">
-                    <div v-if="!isLoading && query != ''" class="grid gap-12 justify-center mx-auto min-h-screen"
+                    <div
+                        v-if="!isLoading && query != ''"
+                        class="grid gap-12 justify-center mx-auto min-h-screen"
                         :style="{
                             gridTemplateColumns: `repeat(${gridColsNum}, minmax(0, 1fr))`,
-                        }">
-                        <div v-for="n in gridColsNum" class="flex flex-col gap-16">
-                            <AnimeBanner v-for="anime in animeList.filter(
-                                (_, i) => (i % gridColsNum) + 1 == n
-                            )" :selected-anime="anime" />
+                        }"
+                    >
+                        <div
+                            v-for="n in gridColsNum"
+                            class="flex flex-col gap-16"
+                        >
+                            <AnimeBanner
+                                v-for="anime in animeList.filter(
+                                    (_, i) => (i % gridColsNum) + 1 == n
+                                )"
+                                :selected-anime="anime"
+                            />
                         </div>
                     </div>
                 </Transition>
 
-                <section v-if="isLoading && query != ''" class="flex justify-center min-h-screen">
+                <section
+                    v-if="isLoading && query != ''"
+                    class="flex justify-center min-h-screen"
+                >
                     <Loading></Loading>
                 </section>
 
-                <Pagination v-if="animeList.length > 0 && query != ''" :currentPage="currentPage"
-                    :totalPages="totalPages" :class="isLoading
-                        ? 'opacity-0 transition-all duration-300'
-                        : 'opacity-100'
-                        " @pageChange="lastPagination" />
+                <Pagination
+                    v-if="animeList.length > 0 && query != ''"
+                    :currentPage="currentPage"
+                    :totalPages="totalPages"
+                    :class="
+                        isLoading
+                            ? 'opacity-0 transition-all duration-300'
+                            : 'opacity-100'
+                    "
+                    @pageChange="lastPagination"
+                />
             </div>
         </ContentTemplate>
         <Header />

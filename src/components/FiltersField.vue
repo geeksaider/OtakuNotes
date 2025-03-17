@@ -11,7 +11,7 @@ interface Props {
     position: Position;
 }
 
-const { isActive, filtersList, position = "default" } = defineProps<Props>();
+const { isActive, filtersList, position } = defineProps<Props>();
 const emit = defineEmits(["apply", "updateActive"]);
 const submit = () => emit("apply", selectedFilters);
 const positionStyle: Record<Position, string> = {
