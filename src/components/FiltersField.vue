@@ -5,15 +5,13 @@ import type { Filters } from "@/composables/filters";
 
 interface Props {
     isActive: boolean;
+    filtersList: Filters;
 }
 
-const { isActive } = defineProps<Props>();
+const { isActive, filtersList } = defineProps<Props>();
 const emit = defineEmits(["apply", "updateActive"]);
 const selectedFilters = reactive<Filters>({
-    type: undefined,
-    age: undefined,
-    year: undefined,
-    minRating: undefined,
+    ...filtersList
 });
 
 const validateSelectedYear = () => {
@@ -29,75 +27,68 @@ const submit = () => emit("apply", selectedFilters);
 
 <template>
     <section class="relative">
-        <button
-            id="filter-button"
+        <button id="filter-button"
             class="flex h-11 w-11 items-center justify-center rounded-full ring-2 shadow-md hover:bg-first/50 transition-all"
-            :class="isActive ? ' ring-second' : ' bg-white  ring-first'"
-            @click="$emit('updateActive')"
-        >
+            :class="isActive ? ' ring-second' : ' bg-white  ring-first'" @click="$emit('updateActive')">
             <Filter class="fill-second"></Filter>
         </button>
 
         <Transition name="change">
-            <form
-                v-if="isActive"
-                class="absolute top-14 right-0 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
-                @submit.prevent="submit"
-            >
+            <form v-if="isActive" class="absolute top-14 right-0 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
+                @submit.prevent="submit">
                 <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
-                <label class="block font-bold text-sm">Тип:</label>
-                <select
-                    class="border rounded-lg p-2 w-full mb-3"
-                    v-model="selectedFilters.type"
-                >
-                    <option :value="undefined">Все</option>
-                    <option value="tv">TV</option>
-                    <option value="movie">Фильм</option>
-                    <option value="ova">OVA</option>
-                    <option value="special">Спецвыпуск</option>
-                </select>
+                <div v-if="'type' in filtersList">
+                    <label class="font-bold text-sm">Тип:</label>
+                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.type">
+                        <option :value="undefined">Все</option>
+                        <option value="tv">TV</option>
+                        <option value="movie">Фильм</option>
+                        <option value="ova">OVA</option>
+                        <option value="special">Спецвыпуск</option>
+                    </select>
+                </div>
 
-                <label class="block font-bold text-sm">Возраст:</label>
-                <select
-                    class="border rounded-lg p-2 w-full mb-3"
-                    v-model="selectedFilters.age"
-                >
-                    <option :value="undefined">Все</option>
-                    <option value="g">G - All Ages</option>
-                    <option value="pg">PG - Дети</option>
-                    <option value="pg13">PG-13 - Подростки > 13</option>
-                    <option value="r17">R - 17+</option>
-                    <option value="r">R+ - Mild Nudity</option>
-                    <option value="rx">Rx - Hentai</option>
-                </select>
+                <div v-if="'age' in filtersList">
+                    <label class="font-bold text-sm">Возраст:</label>
+                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.age">
+                        <option :value="undefined">Все</option>
+                        <option value="g">G - All Ages</option>
+                        <option value="pg">PG - Дети</option>
+                        <option value="pg13">PG-13 - Подростки > 13</option>
+                        <option value="r17">R - 17+</option>
+                        <option value="r">R+ - Mild Nudity</option>
+                        <option value="rx">Rx - Hentai</option>
+                    </select>
+                </div>
 
-                <label class="block font-bold text-sm">Год:</label>
-                <input
-                    type="number"
-                    class="border rounded-lg p-2 w-full mb-3"
-                    placeholder="Введите год"
-                    min="1963"
-                    :max="new Date().getFullYear() + 100"
-                    @change="validateSelectedYear"
-                    v-model="selectedFilters.year"
-                />
+                <div v-if="'filter' in filtersList">
+                    <label class="font-bold text-sm">Фильтрация:</label>
+                    <select class="border rounded-lg p-2 w-full mb-3" v-model="selectedFilters.filter">
+                        <option :value="undefined" selected>Все</option>
+                        <option value="airing">Выходят</option>
+                        <option value="upcoming">Ждем всей деревней</option>
+                        <option value="bypopularity">По популярности</option>
+                        <option value="favorite">Любимки</option>
+                    </select>
+                </div>
 
-                <label class="block font-bold text-sm">Мин. рейтинг:</label>
-                <input
-                    type="number"
-                    class="border rounded-lg p-2 w-full mb-4"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    placeholder="От 0 до 10"
-                    v-model="selectedFilters.minRating"
-                />
+                <div v-if="'year' in filtersList">
+                    <label class="font-bold text-sm">Год:</label>
+                    <input type="number" class="border rounded-lg p-2 w-full mb-3" placeholder="Введите год" min="1963"
+                        :max="new Date().getFullYear() + 100" @change="validateSelectedYear"
+                        v-model="selectedFilters.year" />
+                </div>
 
-                <button
-                    type="submit"
-                    class="w-full bg-second/90 text-white p-2 rounded-lg hover:bg-second transition"
-                >
+                <div v-if="'minRating' in filtersList">
+                    <label class="font-bold text-sm">Мин. рейтинг:</label>
+                    <input type="number" class="border rounded-lg p-2 w-full " min="0" max="10" step="0.1"
+                        placeholder="От 0 до 10" v-model="selectedFilters.minRating" />
+                </div>
+
+
+                <button type="submit"
+                    class="w-full bg-second/90 text-white p-2 rounded-lg mt-4 hover:bg-second transition">
                     Применить
                 </button>
             </form>
@@ -110,6 +101,7 @@ const submit = () => emit("apply", selectedFilters);
 .change-leave-active {
     transition: opacity 0.5s ease;
 }
+
 .change-enter-from,
 .change-leave-to {
     opacity: 0;
