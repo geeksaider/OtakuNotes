@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { watch, ref } from "vue";
 import { useApi } from "@/composables/useAPI";
-import { useGrid } from "@/composables/useGrid";
 import type { Anime } from "@/composables/anime";
 import type { Filters } from "@/composables/filters";
 
@@ -18,7 +17,6 @@ const query = ref<string>("");
 const isLoading = ref<boolean>(false);
 const animeList = ref<Anime[]>([]);
 const totalPages = ref<number>(0);
-const { gridColsNum } = useGrid();
 const currentPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
 
@@ -83,7 +81,7 @@ watch(
 
 <template>
     <div
-        class="min-h-[101vh] text-third flex flex-col"
+        class="min-h-[101vh] text-third flex flex-col font-primary"
         @mousedown="showFilters = false"
     >
         <Header />
@@ -113,22 +111,12 @@ watch(
                 <Transition name="fade">
                     <div
                         v-if="!isLoading && query != ''"
-                        class="grid gap-12 justify-center mx-auto min-h-screen"
-                        :style="{
-                            gridTemplateColumns: `repeat(${gridColsNum}, minmax(0, 1fr))`,
-                        }"
+                        class="grid grid-cols-4 gap-12 justify-center mx-auto min-h-screen"
                     >
-                        <div
-                            v-for="n in gridColsNum"
-                            class="flex flex-col gap-16"
-                        >
-                            <AnimeBanner
-                                v-for="anime in animeList.filter(
-                                    (_, i) => (i % gridColsNum) + 1 == n
-                                )"
-                                :selected-anime="anime"
-                            />
-                        </div>
+                        <AnimeBanner
+                            v-for="anime in animeList"
+                            :selected-anime="anime"
+                        />
                     </div>
                 </Transition>
 

@@ -16,31 +16,22 @@ const isActive = computed(() =>
 </script>
 
 <template>
-    <RouterLink class="py-1 px-4 bg-white relative group" :to="link">
+    <RouterLink
+        :to="link"
+        class="px-5 py-2.5 relative group transition-all duration-300"
+        :class="isActive ? 'text-second' : 'text-third/80 hover:text-second'"
+    >
+        <span class="text-xl" :class="isActive ? 'font-medium' : 'font-normal'">
+            <slot />
+        </span>
+
         <div
-            class="w-2 h-2 border-l border-t border-third transition-all duration-500 absolute left-0 top-0 group-hover:w-[50%] group-hover:h-[50%]"
-            :class="{
-                'w-[50%] h-[50%] group-hover:w-2 group-hover:h-2': isActive,
-            }"
-        />
-        <div
-            class="w-2 h-2 border-r border-t border-third transition-all duration-500 absolute right-0 top-0 group-hover:w-[50%] group-hover:h-[50%]"
-            :class="{
-                'w-[50%] h-[50%] group-hover:w-2 group-hover:h-2': isActive,
-            }"
-        />
-        <slot></slot>
-        <div
-            class="w-2 h-2 border-l border-b border-third transition-all duration-500 absolute left-0 bottom-0 group-hover:w-[50%] group-hover:h-[50%]"
-            :class="{
-                'w-[50%] h-[50%] group-hover:w-2 group-hover:h-2': isActive,
-            }"
-        />
-        <div
-            class="w-2 h-2 border-r border-b border-third transition-all duration-500 absolute right-0 bottom-0 group-hover:w-[50%] group-hover:h-[50%]"
-            :class="{
-                'w-[50%] h-[50%] group-hover:w-2 group-hover:h-2': isActive,
-            }"
+            class="absolute bottom-0 left-0 w-full h-0.5 origin-left transition-all duration-300"
+            :class="
+                isActive
+                    ? 'bg-second scale-x-100 '
+                    : 'bg-second/10 group-hover:scale-x-100 scale-x-0  '
+            "
         />
     </RouterLink>
 </template>

@@ -1,61 +1,55 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
 import { RouterLink } from "vue-router";
+import type { Anime } from "@/composables/anime";
 
-const { selectedAnime } = defineProps(["selectedAnime"]);
+interface Props {
+    selectedAnime: Anime;
+}
+
+const { selectedAnime } = defineProps<Props>();
 </script>
 
 <template>
     <RouterLink
         v-if="selectedAnime"
         :to="`/anime/${selectedAnime.mal_id}`"
-        class="flex flex-col h-fit gap-4 max-w-60"
+        class="bg-white rounded-xl shadow-lg hover:shadow-xl max-h-[450px] transition-shadow duration-300"
     >
-        <div class="relative flex justify-center">
+        <div class="relative aspect-[4/5] bg-second/5">
             <img
-                v-if="selectedAnime.images && selectedAnime.images.webp"
-                :src="
-                    'webp' in selectedAnime.images
-                        ? selectedAnime.images.webp.image_url
-                        : ''
-                "
-                :alt="
-                    selectedAnime.titles.find(
-                        (title) => title.type == 'English'
-                    )
-                        ? selectedAnime.titles.find(
-                              (title) => title.type == 'English'
-                          ).title
-                        : selectedAnime.titles[0].title
-                "
-                class="rounded-lg shadow-sm shadow-third select-none"
+                :src="selectedAnime.images?.webp.large_image_url"
+                :alt="selectedAnime.titles[0]?.title"
+                class="h-full w-full object-cover rounded-t-xl"
             />
-            <div class="absolute flex bottom-1 right-4 group">
-                <span
-                    class="bg-black opacity-80 px-3 select-none py-px rounded-2xl items-center text-white font-bold text-xl"
-                >
-                    {{ selectedAnime.score ? selectedAnime.score : "-" }}
+
+            <div
+                class="absolute top-3 right-2 bg-second/90 backdrop-blur-sm px-3 py-1.5 rounded-md"
+            >
+                <span class="text-white font-bold">
+                    ★ {{ selectedAnime.score || "—" }}
                 </span>
             </div>
         </div>
 
-        <div class="bg-white flex flex-col rounded-lg shadow-md py-2 px-4">
-            <h1 class="text-xl font-bold max-h-[1.2em] truncate">
+        <div class="flex flex-col gap-4 p-4">
+            <h3
+                class="text-lg font-semibold text-third line-clamp-2 min-h-[2em]"
+            >
                 {{
-                    selectedAnime.titles.find(
-                        (title) => title.type == "English"
-                    )
-                        ? selectedAnime.titles.find(
-                              (title) => title.type == "English"
-                          ).title
-                        : selectedAnime.titles[0].title
+                    selectedAnime.titles.find((t) => t.type === "English")
+                        ?.title || selectedAnime.titles[0]?.title
                 }}
-            </h1>
+            </h3>
 
-            <p>
-                {{ selectedAnime.type == "TV" ? "TV сериал" : "Фильм" }}
-            </p>
-            <p class="text-third/80 font-semibold">{{ selectedAnime.year }}</p>
+            <div class="flex items-center gap-3 text-sm">
+                <span class="px-2.5 py-1 bg-second/10 text-second rounded-md">
+                    {{ selectedAnime.type }}
+                </span>
+                <span class="text-third/80 font-semibold">{{
+                    selectedAnime.year
+                }}</span>
+            </div>
         </div>
     </RouterLink>
 </template>

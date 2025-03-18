@@ -14,15 +14,19 @@ const isActive = computed(() => route.path === link);
 
 <template>
     <RouterLink
-        class="text-2xl relative group"
+        class="relative group text-lg font-primary transition-colors"
         :class="{
-            'font-bold': isActive,
+            'text-second font-medium': isActive,
+            'text-third/80 hover:text-second': !isActive,
         }"
         :to="link"
     >
-        <slot></slot>
-        <div
-            class="w-0 h-0.5 transition-all mx-auto bg-third rounded-3xl group-hover:w-[90%]"
-        />
+        <span class="relative inline-block pb-1">
+            <slot />
+            <div
+                v-if="isActive"
+                class="absolute bottom-0 left-0 w-full h-0.5 bg-second/80"
+            />
+        </span>
     </RouterLink>
 </template>

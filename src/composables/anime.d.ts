@@ -5,6 +5,7 @@ export interface Anime {
     popularity?: number;
     episodes?: number;
     status: string;
+    mal_id: number;
     aired: {
         string: string;
     };
@@ -16,6 +17,7 @@ export interface Anime {
     }[];
     genres: {
         name: string;
+        mal_id: number;
     }[];
     themes: {
         name: string;
