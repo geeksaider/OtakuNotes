@@ -1,20 +1,22 @@
 import type { Config } from "tailwindcss";
 
 export default {
-    content: ["./src/**/*.{vue,ts}", "./index.html"],
-    theme: {
-        extend: {
-            colors: {
-                first: "#E6E4D8 ",
-                second: "#8C6D51",
-                third: "#323843",
-                background: "#F9F9F9",
-            },
+  content: ["./src/**/*.{vue,ts}", "./index.html"],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          300: "#E6E4D8",
+          500: "#8C6D51",
         },
-        fontFamily: {
-            logo: ['"Poppins", serif'],
-            primary: ['"Montserrat", serif'],
-        },
+        black: "#323843",
+        background: "#F9F9F9",
+      },
     },
-    plugins: [],
+    fontFamily: {
+      logo: '"Poppins", serif',
+      primary: '"Wix Madefor Display", sans-serif',
+    },
+  },
+  plugins: [],
 } satisfies Config;

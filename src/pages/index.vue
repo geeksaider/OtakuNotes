@@ -21,137 +21,126 @@ const currentPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
 
 const param = ref<Filters>({
-    type: undefined,
-    age: undefined,
-    year: undefined,
-    minRating: undefined,
+  type: undefined,
+  age: undefined,
+  year: undefined,
+  minRating: undefined,
 });
 
 const applyFilters = (selectedFilters: Filters) => {
-    Object.assign(param.value, selectedFilters);
-    showFilters.value = false;
+  Object.assign(param.value, selectedFilters);
+  showFilters.value = false;
 };
 
 const lastPagination = (page: number) => {
-    window.scrollTo({ top: 100, behavior: "smooth" });
-    currentPage.value = page;
+  window.scrollTo({ top: 100, behavior: "smooth" });
+  currentPage.value = page;
 };
 
 watch(
-    [query, param],
-    () => {
-        currentPage.value = 1;
-    },
-    { deep: true }
+  [query, param],
+  () => {
+    currentPage.value = 1;
+  },
+  { deep: true }
 );
 
 watch(
-    [query, param, currentPage],
-    () => {
-        useApi<Anime[]>(
-            "/anime",
-            {
-                queryParams: {
-                    q: query.value,
-                    sfw: param.value.age == "rx" ? false : true,
-                    page: currentPage.value,
-                    rating: param.value.age ? param.value.age : "",
-                    type: param.value.type ? param.value.type : "",
-                    start_date: param.value.year
-                        ? `${param.value.year}-01-01`
-                        : "",
-                    end_date: param.value.year
-                        ? `${param.value.year}-12-31`
-                        : "",
-                    min_score: param.value.minRating
-                        ? param.value.minRating
-                        : "",
-                    limit: 24,
-                },
-            },
-            isLoading
-        ).then(({ data, body }) => {
-            animeList.value = data;
-            totalPages.value = body.pagination.last_visible_page;
-        });
-    },
-    { deep: true }
+  [query, param, currentPage],
+  () => {
+    useApi<Anime[]>(
+      "/anime",
+      {
+        queryParams: {
+          q: query.value,
+          sfw: param.value.age == "rx" ? false : true,
+          page: currentPage.value,
+          rating: param.value.age ? param.value.age : "",
+          type: param.value.type ? param.value.type : "",
+          start_date: param.value.year ? `${param.value.year}-01-01` : "",
+          end_date: param.value.year ? `${param.value.year}-12-31` : "",
+          min_score: param.value.minRating ? param.value.minRating : "",
+          limit: 24,
+        },
+      },
+      isLoading
+    ).then(({ data, body }) => {
+      animeList.value = data;
+      totalPages.value = body.pagination.last_visible_page;
+    });
+  },
+  { deep: true }
 );
 </script>
 
 <template>
-    <div
-        class="min-h-[101vh] text-third flex flex-col font-primary"
-        @mousedown="showFilters = false"
-    >
-        <Header />
-        <ContentTemplate class="bg-background flex-grow pb-20">
-            <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
-                <section class="flex gap-2 justify-center items-center">
-                    <SearchInput class="justify-center" v-model="query" />
-                    <FiltersField
-                        :is-active="showFilters"
-                        :filters-list="param"
-                        position="default"
-                        @mousedown.stop
-                        @update-active="showFilters = !showFilters"
-                        @apply="applyFilters"
-                    ></FiltersField>
-                </section>
+  <div
+    class="min-h-[101vh] text-black flex flex-col font-primary"
+    @mousedown="showFilters = false"
+  >
+    <Header />
+    <ContentTemplate class="bg-background flex-grow pb-20">
+      <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
+        <section class="flex gap-2 justify-center items-center">
+          <SearchInput class="justify-center" v-model="query" />
+          <FiltersField
+            :is-active="showFilters"
+            :filters-list="param"
+            position="default"
+            @mousedown.stop
+            @update-active="showFilters = !showFilters"
+            @apply="applyFilters"
+          ></FiltersField>
+        </section>
 
-                <Pagination
-                    v-if="animeList.length > 0 && query != ''"
-                    :currentPage="currentPage"
-                    :totalPages="totalPages"
-                    @pageChange="(page) => (currentPage = page)"
-                />
+        <Pagination
+          v-if="animeList.length > 0 && query != ''"
+          :currentPage="currentPage"
+          :totalPages="totalPages"
+          @pageChange="(page) => (currentPage = page)"
+        />
 
-                <MainField v-if="query == ''" />
+        <MainField v-if="query == ''" />
 
-                <Transition name="fade">
-                    <div
-                        v-if="!isLoading && query != ''"
-                        class="grid grid-cols-4 gap-12 justify-center mx-auto min-h-screen"
-                    >
-                        <AnimeBanner
-                            v-for="anime in animeList"
-                            :selected-anime="anime"
-                        />
-                    </div>
-                </Transition>
+        <Transition name="fade">
+          <div
+            v-if="!isLoading && query != ''"
+            class="grid grid-cols-4 gap-12 justify-center mx-auto min-h-screen"
+          >
+            <AnimeBanner v-for="anime in animeList" :selected-anime="anime" />
+          </div>
+        </Transition>
 
-                <section
-                    v-if="isLoading && query != ''"
-                    class="flex justify-center min-h-screen"
-                >
-                    <Loading></Loading>
-                </section>
+        <section
+          v-if="isLoading && query != ''"
+          class="flex justify-center min-h-screen"
+        >
+          <Loading></Loading>
+        </section>
 
-                <Pagination
-                    v-if="animeList.length > 0 && query != ''"
-                    :currentPage="currentPage"
-                    :totalPages="totalPages"
-                    :class="
-                        isLoading
-                            ? 'opacity-0 transition-all duration-300'
-                            : 'opacity-100'
-                    "
-                    @pageChange="lastPagination"
-                />
-            </div>
-        </ContentTemplate>
-        <Header />
-    </div>
+        <Pagination
+          v-if="animeList.length > 0 && query != ''"
+          :currentPage="currentPage"
+          :totalPages="totalPages"
+          :class="
+            isLoading ? 'opacity-0 transition-all duration-300' : 'opacity-100'
+          "
+          @pageChange="lastPagination"
+        />
+      </div>
+    </ContentTemplate>
+    <Header />
+  </div>
 </template>
 
 <style>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>

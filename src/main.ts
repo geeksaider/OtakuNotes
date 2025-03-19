@@ -13,20 +13,16 @@ const router = createRouter({
       children: [
         {
           path: "",
-          name: "CollectionsDefault",
           component: () => import("./pages/Collections/DefaultCollections.vue"),
         },
         {
           path: "all-time",
-          name: "AllTimeCollections",
           component: () => import("./pages/Collections/AllTimeCollections.vue"),
         },
         {
           path: "season-time",
-          name: "SeasonCollections",
           component: () => import("./pages/Collections/SeasonCollections.vue"),
         },
-        
       ],
     },
     {
