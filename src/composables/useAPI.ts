@@ -39,8 +39,6 @@ export async function useApi<T, B = any>(
 
     loading && (loading.value = false);
 
-    console.log(response.url);
-
     return { status, response, body, data: body.data };
 }
 

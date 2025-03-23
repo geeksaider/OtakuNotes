@@ -32,11 +32,6 @@ const applyFilters = (selectedFilters: Filters) => {
     showFilters.value = false;
 };
 
-const lastPagination = (page: number) => {
-    window.scrollTo({ top: 100, behavior: "smooth" });
-    currentPage.value = page;
-};
-
 watch(
     [query, param],
     () => {
@@ -101,30 +96,31 @@ watch(
 
                 <Pagination
                     v-if="animeList.length > 0 && query != ''"
-                    :currentPage="currentPage"
                     :totalPages="totalPages"
-                    @pageChange="(page) => (currentPage = page)"
+                    v-model="currentPage"
                 >
-                    <MainField v-if="query == ''" />
+                    <div>
+                        <MainField v-if="query == ''" />
 
-                    <Transition name="fade">
-                        <div
-                            v-if="!isLoading && query != ''"
-                            class="grid grid-cols-4 gap-12 justify-center mx-auto min-h-screen"
+                        <Transition name="fade">
+                            <div
+                                v-if="!isLoading && query != ''"
+                                class="grid grid-cols-4 gap-12 justify-center mx-auto min-h-screen"
+                            >
+                                <AnimeBanner
+                                    v-for="anime in animeList"
+                                    :selected-anime="anime"
+                                />
+                            </div>
+                        </Transition>
+
+                        <section
+                            v-if="isLoading && query != ''"
+                            class="flex justify-center min-h-screen"
                         >
-                            <AnimeBanner
-                                v-for="anime in animeList"
-                                :selected-anime="anime"
-                            />
-                        </div>
-                    </Transition>
-
-                    <section
-                        v-if="isLoading && query != ''"
-                        class="flex justify-center min-h-screen"
-                    >
-                        <Loading></Loading>
-                    </section>
+                            <Loading></Loading>
+                        </section>
+                    </div>
                 </Pagination>
             </div>
         </ContentTemplate>
