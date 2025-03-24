@@ -17,11 +17,7 @@ const currentPage = ref<number>(1);
 const showFilters = ref<boolean>(false);
 const filterPosition = ref<string>("default");
 
-const param = ref<Filters>({
-  type: undefined,
-  age: undefined,
-  filter: undefined,
-});
+const param = ref<Filters>({});
 
 const applyFilters = (selectedFilters: Filters) => {
   Object.assign(param.value, selectedFilters);
@@ -83,47 +79,41 @@ watch(
   >
     <ContentTemplate class="bg-background flex-grow pb-20">
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
-        <section class="flex gap-2 w-fit mx-auto justify-center items-center">
+        <section>
           <Pagination
             :currentPage="currentPage"
             :totalPages="totalPages"
             @pageChange="(page) => (currentPage = page)"
-          />
-          <FiltersField
-            :is-active="showFilters"
-            :filters-list="param"
-            :position="filterPosition"
-            @mousedown.stop
-            @update-active="showFilters = !showFilters"
-            @apply="applyFilters"
           >
-          </FiltersField>
+            <template v-slot:filter>
+              <FiltersField
+                :is-active="showFilters"
+                :filters-list="param"
+                :position="filterPosition"
+                @mousedown.stop
+                @update-active="showFilters = !showFilters"
+                @apply="applyFilters"
+              />
+            </template>
+            <Transition name="fade">
+              <div
+                v-if="!isLoading"
+                class="grid gap-12 justify-center mx-auto min-h-screen"
+              >
+                <div class="grid grid-cols-4 gap-16">
+                  <AnimeBanner
+                    v-for="anime in animeList"
+                    :selected-anime="anime"
+                  />
+                </div>
+              </div>
+            </Transition>
+          </Pagination>
         </section>
-
-        <Transition name="fade">
-          <div
-            v-if="!isLoading"
-            class="grid gap-12 justify-center mx-auto min-h-screen"
-          >
-            <div class="grid grid-cols-4 gap-16">
-              <AnimeBanner v-for="anime in animeList" :selected-anime="anime" />
-            </div>
-          </div>
-        </Transition>
 
         <section v-if="isLoading" class="flex justify-center min-h-screen">
           <Loading></Loading>
         </section>
-
-        <Pagination
-          v-if="animeList.length > 0"
-          :currentPage="currentPage"
-          :totalPages="totalPages"
-          :class="
-            isLoading ? 'opacity-0 transition-all duration-300' : 'opacity-100'
-          "
-          @pageChange="lastPagination"
-        />
       </div>
     </ContentTemplate>
   </div>

@@ -18,48 +18,39 @@ const isLoading = ref<boolean>(false);
 const animeList = ref<Anime[]>([]);
 const totalPages = ref<number>(0);
 const currentPage = ref<number>(1);
+const filters = ref<Filters>({});
 
-const param = ref<Filters>({
-  type: undefined,
-  age: undefined,
-  year: undefined,
-  minRating: undefined,
-});
-
-watch(
-  [query, param],
-  () => {
-    currentPage.value = 1;
-  },
-  { deep: true }
-);
-
-watch(
-  [query, param, currentPage],
-  () => {
-    useApi<Anime[]>(
-      "/anime",
-      {
-        queryParams: {
-          q: query.value,
-          sfw: param.value.age == "rx" ? false : true,
-          page: currentPage.value,
-          rating: param.value.age ? param.value.age : "",
-          type: param.value.type ? param.value.type : "",
-          start_date: param.value.year ? `${param.value.year}-01-01` : "",
-          end_date: param.value.year ? `${param.value.year}-12-31` : "",
-          min_score: param.value.minRating ? param.value.minRating : "",
-          limit: 24,
-        },
+const getApiResponse = () => {
+  useApi<Anime[]>(
+    "/anime",
+    {
+      queryParams: {
+        q: query.value,
+        sfw: filters.value.age == "rx" ? false : true,
+        page: currentPage.value,
+        rating: filters.value.age ? filters.value.age : "",
+        type: filters.value.type ? filters.value.type : "",
+        start_date: filters.value.year ? `${filters.value.year}-01-01` : "",
+        end_date: filters.value.year ? `${filters.value.year}-12-31` : "",
+        min_score: filters.value.minRating ? filters.value.minRating : "",
+        limit: 24,
       },
-      isLoading
-    ).then(({ data, body }) => {
-      animeList.value = data;
-      totalPages.value = body.pagination.last_visible_page;
-    });
-  },
-  { deep: true }
-);
+    },
+    isLoading
+  ).then(({ data, body }) => {
+    animeList.value = data;
+    totalPages.value = body.pagination.last_visible_page;
+  });
+};
+
+const resetPage = () => {
+  if (currentPage.value == 1) getApiResponse();
+  currentPage.value = 1;
+};
+
+watch(query, resetPage);
+
+watch([query, currentPage], getApiResponse);
 </script>
 
 <template>
@@ -69,7 +60,7 @@ watch(
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
         <section class="flex gap-2 justify-center items-center">
           <SearchInput class="justify-center" v-model="query" />
-          <FiltersField v-model="param" type="search" />
+          <FiltersField v-model="filters" type="search" @apply="resetPage" />
         </section>
 
         <MainField v-if="query == ''" />

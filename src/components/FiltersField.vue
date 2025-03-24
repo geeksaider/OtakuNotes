@@ -1,50 +1,78 @@
 <script setup lang="ts">
-import { defineEmits, reactive, defineProps } from "vue";
+import { defineEmits, defineModel, defineProps, onMounted, ref } from "vue";
 import Filter from "./SVG/Filter.vue";
 import Reset from "./SVG/Reset.vue";
 import type { Filters } from "@/composables/filters";
 
-type Position = "center" | "left" | "right" | "default";
+// center: "left-1/2 transform -translate-x-1/2",
+// left: "left-0",
+// right: "right-0",
+
+type Variant = "search" | "collections";
+
 interface Props {
-  filtersList: Filters;
-  position?: Position;
+  variant?: Variant;
+  className?: string;
 }
 
-const { filtersList, position = "default" } = defineProps<Props>();
+const { variant = "search", className = "right-0" } = defineProps<Props>();
+const filters = defineModel<Filters>({ default: {} });
+const isActive = ref<boolean>(false);
 const emit = defineEmits(["apply"]);
-const submit = () => emit("apply", selectedFilters);
-const positionStyle: Record<Position, string> = {
-  center: "left-1/2 transform -translate-x-1/2",
-  left: "left-0",
-  right: "right-0",
-  default: "right-0",
+
+const submit = () => {
+  isActive.value = false;
+  emit("apply");
 };
-const selectedFilters = reactive<Filters>({
-  ...filtersList,
-});
+
+filters.value = {
+  search: {
+    type: undefined,
+    age: undefined,
+    year: undefined,
+    minRating: undefined,
+  },
+  collections: {
+    type: undefined,
+    age: undefined,
+    filter: undefined,
+  },
+}[variant];
 
 const validateSelectedYear = () => {
-  if (selectedFilters.year)
-    selectedFilters.year = Math.max(
-      Math.min(selectedFilters.year, new Date().getFullYear() + 100),
+  if (filters.value.year)
+    filters.value.year = Math.max(
+      Math.min(filters.value.year, new Date().getFullYear() + 100),
       1963
     );
 };
 
-const reset = () => {
-  for (let key in selectedFilters) {
-    selectedFilters[key] = undefined;
-  }
+const updateActive = () => {
+  isActive.value = !isActive.value;
 };
+
+const reset = () => {
+  for (let key in filters.value) {
+    filters.value[key] = undefined;
+  }
+  submit();
+};
+
+onMounted(() => {
+  window.onclick = () => (isActive.value = false);
+  document.onkeydown = (e) => {
+    e.key == "Escape" && (isActive.value = false);
+  };
+});
 </script>
 
 <template>
-  <section class="relative">
+  <section class="relative" @click.stop>
     <button
       id="filter-button"
       class="flex h-11 w-11 items-center justify-center rounded-full ring-2 shadow-md hover:bg-primary-300/50 transition-all"
       :class="isActive ? ' ring-primary-500' : ' bg-white  ring-primary-300'"
-      @click="$emit('updateActive')"
+      @click="updateActive"
     >
       <Filter class="fill-primary-500"></Filter>
     </button>
@@ -53,16 +81,16 @@ const reset = () => {
       <form
         v-if="isActive"
         class="absolute top-16 bg-white p-6 rounded-lg shadow-lg w-[300px] z-50"
-        :class="positionStyle[position]"
+        :class="className"
         @submit.prevent="submit"
       >
         <h2 class="text-lg font-bold mb-3">Фильтры</h2>
 
-        <div v-if="'type' in filtersList">
+        <div v-if="'type' in filters">
           <label class="font-bold text-sm">Тип:</label>
           <select
             class="border rounded-lg p-2 w-full mb-3"
-            v-model="selectedFilters.type"
+            v-model="filters.type"
           >
             <option :value="undefined">Все</option>
             <option value="tv">TV</option>
@@ -72,11 +100,11 @@ const reset = () => {
           </select>
         </div>
 
-        <div v-if="'age' in filtersList">
+        <div v-if="'age' in filters">
           <label class="font-bold text-sm">Возраст:</label>
           <select
             class="border rounded-lg p-2 w-full mb-3"
-            v-model="selectedFilters.age"
+            v-model="filters.age"
           >
             <option :value="undefined">Все</option>
             <option value="g">G - All Ages</option>
@@ -88,11 +116,11 @@ const reset = () => {
           </select>
         </div>
 
-        <div v-if="'filter' in filtersList">
+        <div v-if="'filter' in filters">
           <label class="font-bold text-sm">Фильтрация:</label>
           <select
             class="border rounded-lg p-2 w-full mb-3"
-            v-model="selectedFilters.filter"
+            v-model="filters.filter"
           >
             <option :value="undefined" selected>Все</option>
             <option value="airing">Выходят</option>
@@ -102,7 +130,7 @@ const reset = () => {
           </select>
         </div>
 
-        <div v-if="'year' in filtersList">
+        <div v-if="'year' in filters">
           <label class="font-bold text-sm">Год:</label>
           <input
             type="number"
@@ -111,11 +139,11 @@ const reset = () => {
             min="1963"
             :max="new Date().getFullYear() + 100"
             @change="validateSelectedYear"
-            v-model="selectedFilters.year"
+            v-model="filters.year"
           />
         </div>
 
-        <div v-if="'minRating' in filtersList">
+        <div v-if="'minRating' in filters">
           <label class="font-bold text-sm">Мин. рейтинг:</label>
           <input
             type="number"
@@ -124,7 +152,7 @@ const reset = () => {
             max="10"
             step="0.1"
             placeholder="От 0 до 10"
-            v-model="selectedFilters.minRating"
+            v-model="filters.minRating"
           />
         </div>
 
