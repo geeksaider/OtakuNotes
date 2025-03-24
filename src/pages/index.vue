@@ -18,7 +18,6 @@ const isLoading = ref<boolean>(false);
 const animeList = ref<Anime[]>([]);
 const totalPages = ref<number>(0);
 const currentPage = ref<number>(1);
-const showFilters = ref<boolean>(false);
 
 const param = ref<Filters>({
   type: undefined,
@@ -26,11 +25,6 @@ const param = ref<Filters>({
   year: undefined,
   minRating: undefined,
 });
-
-const applyFilters = (selectedFilters: Filters) => {
-  Object.assign(param.value, selectedFilters);
-  showFilters.value = false;
-};
 
 watch(
   [query, param],
@@ -69,23 +63,13 @@ watch(
 </script>
 
 <template>
-  <div
-    class="min-h-[101vh] text-black flex flex-col font-primary"
-    @mousedown="showFilters = false"
-  >
+  <div class="min-h-[101vh] text-black flex flex-col font-primary">
     <Header />
     <ContentTemplate class="bg-background flex-grow pb-20">
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
         <section class="flex gap-2 justify-center items-center">
           <SearchInput class="justify-center" v-model="query" />
-          <FiltersField
-            :is-active="showFilters"
-            :filters-list="param"
-            position="default"
-            @mousedown.stop
-            @update-active="showFilters = !showFilters"
-            @apply="applyFilters"
-          ></FiltersField>
+          <FiltersField v-model="param" type="search" />
         </section>
 
         <MainField v-if="query == ''" />
@@ -94,7 +78,7 @@ watch(
           v-if="isLoading && query != '' && animeList.length == 0"
           class="flex justify-center min-h-screen"
         >
-          <Loading></Loading>
+          <Loading />
         </section>
 
         <Pagination

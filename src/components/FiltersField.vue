@@ -6,13 +6,12 @@ import type { Filters } from "@/composables/filters";
 
 type Position = "center" | "left" | "right" | "default";
 interface Props {
-  isActive: boolean;
   filtersList: Filters;
-  position: Position;
+  position?: Position;
 }
 
-const { isActive, filtersList, position } = defineProps<Props>();
-const emit = defineEmits(["apply", "updateActive"]);
+const { filtersList, position = "default" } = defineProps<Props>();
+const emit = defineEmits(["apply"]);
 const submit = () => emit("apply", selectedFilters);
 const positionStyle: Record<Position, string> = {
   center: "left-1/2 transform -translate-x-1/2",
