@@ -13,10 +13,6 @@ const router = createRouter({
       children: [
         {
           path: "",
-          component: () => import("./pages/Collections/DefaultCollections.vue"),
-        },
-        {
-          path: "all-time",
           component: () => import("./pages/Collections/AllTimeCollections.vue"),
         },
         {

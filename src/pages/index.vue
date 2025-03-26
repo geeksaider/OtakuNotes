@@ -59,8 +59,8 @@ watch([query, currentPage], getApiResponse);
     <ContentTemplate class="bg-background flex-grow pb-20">
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
         <section class="flex gap-2 justify-center items-center">
-          <SearchInput class="justify-center" v-model="query" />
-          <FiltersField v-model="filters" type="search" @apply="resetPage" />
+          <SearchInput class="justify-center" v-model="query" @mousedown.stop />
+          <FiltersField v-model="filters" variant="search" @apply="resetPage" />
         </section>
 
         <MainField v-if="query == ''" />

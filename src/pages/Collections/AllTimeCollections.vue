@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, onMounted } from "vue";
+import { watch, ref } from "vue";
 import { useApi } from "@/composables/useAPI";
 import type { Anime } from "@/composables/anime";
 import type { Filters } from "@/composables/filters";
@@ -14,85 +14,59 @@ const isLoading = ref<boolean>(false);
 const animeList = ref<Anime[]>([]);
 const totalPages = ref<number>(25);
 const currentPage = ref<number>(1);
-const showFilters = ref<boolean>(false);
-const filterPosition = ref<string>("default");
+const filters = ref<Filters>({});
 
-const param = ref<Filters>({});
-
-const applyFilters = (selectedFilters: Filters) => {
-  Object.assign(param.value, selectedFilters);
-  showFilters.value = false;
-};
-
-const lastPagination = (page: number) => {
-  window.scrollTo({ top: 100, behavior: "smooth" });
-  currentPage.value = page;
-};
-
-watch(
-  [param],
-  () => {
-    currentPage.value = 1;
-  },
-  { deep: true }
-);
-
-watch(
-  [param, currentPage],
-  () => {
-    useApi<Anime[]>(
-      "/top/anime",
-      {
-        queryParams: {
-          sfw: param.value.age == "rx" ? false : true,
-          page: currentPage.value,
-          rating: param.value.age ? param.value.age : "",
-          type: param.value.type ? param.value.type : "",
-          filter: param.value.filter ? param.value.filter : "",
-          limit: 24,
-        },
+const getApiResponse = () => {
+  useApi<Anime[]>(
+    "/top/anime",
+    {
+      queryParams: {
+        sfw: filters.value.age == "rx" ? false : true,
+        page: currentPage.value,
+        rating: filters.value.age ? filters.value.age : "",
+        type: filters.value.type ? filters.value.type : "",
+        filter: filters.value.filter ? filters.value.filter : "",
+        limit: 24,
       },
-      isLoading
-    ).then(({ data, body }) => {
-      animeList.value = data;
-      animeList.value.length <= 0
-        ? (filterPosition.value = "center")
-        : "default";
-      totalPages.value =
-        body.pagination.last_visible_page > 25
-          ? 25
-          : body.pagination.last_visible_page;
-      totalPages.value == 1 ? (filterPosition.value = "center") : "default";
-    });
-  },
-  { deep: true, immediate: true }
-);
+    },
+    isLoading
+  ).then(({ data, body }) => {
+    animeList.value = data;
+    totalPages.value =
+      body.pagination.last_visible_page > 25
+        ? 25
+        : body.pagination.last_visible_page;
+  });
+};
+
+const resetPage = () => {
+  if (currentPage.value == 1) getApiResponse();
+  currentPage.value = 1;
+};
+
+watch(currentPage, getApiResponse, { immediate: true });
 </script>
 
 <template>
-  <div
-    class="min-h-[101vh] text-black flex flex-col"
-    @mousedown="
-      showFilters = false;
-      showSort = false;
-    "
-  >
+  <div class="min-h-[101vh] text-black flex flex-col">
     <ContentTemplate class="bg-background flex-grow pb-20">
       <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-16">
-        <section>
+        <section class="flex flex-col gap-16">
           <Pagination
-            :currentPage="currentPage"
             :totalPages="totalPages"
-            @pageChange="(page) => (currentPage = page)"
+            :is-loading="isLoading"
+            v-model="currentPage"
           >
             <template v-slot:filter>
               <FiltersField
-                :is-active="showFilters"
-                :filters-list="param"
-                :position="filterPosition"
-                @mousedown.stop
-                @update-active="showFilters = !showFilters"
-                @apply="applyFilters"
+                v-model="filters"
+                variant="collections"
+                :class-name="
+                  totalPages == 1
+                    ? 'left-1/2 transform -translate-x-1/2'
+                    : 'right-0'
+                "
+                @apply="resetPage"
               />
             </template>
             <Transition name="fade">

@@ -1,32 +1,3 @@
-<!-- <script setup lang="ts">
-import ContentTemplate from "@/components/ContentTemplate.vue";
-import Header from "@/components/Header.vue";
-import CollectionsMoving from "@/components/collectionsMoving.vue";
-</script>
-
-<template>
-    <div class="min-h-[101vh] text-black flex flex-col font-primary">
-        <Header />
-        <ContentTemplate>
-            <div class="pt-12 max-w-[1200px] mx-auto flex flex-col gap-12">
-                <div class="flex gap-16 justify-center">
-                    <CollectionsMoving link="/collections"
-                        >Рекоменадции</CollectionsMoving
-                    >
-                    <CollectionsMoving link="/collections/all-time"
-                        >Топ за все время</CollectionsMoving
-                    >
-                    <CollectionsMoving link="/collections/season-time"
-                        >Топ сезона</CollectionsMoving
-                    >
-                </div>
-                <router-view class="flex"></router-view>
-            </div>
-        </ContentTemplate>
-        <Header />
-    </div>
-</template> -->
-
 <script setup lang="ts">
 import ContentTemplate from "@/components/ContentTemplate.vue";
 import Header from "@/components/Header.vue";
@@ -50,13 +21,6 @@ import CollectionsMoving from "@/components/collectionsMoving.vue";
                 class="hover:bg-primary-500/5 px-4 py-2 rounded-lg"
               >
                 Рекомендации
-              </CollectionsMoving>
-
-              <CollectionsMoving
-                link="/collections/all-time"
-                class="hover:bg-primary-500/5 px-4 py-2 rounded-lg"
-              >
-                Исторический топ
               </CollectionsMoving>
 
               <CollectionsMoving

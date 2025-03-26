@@ -14,7 +14,7 @@ const { selectedAnime } = defineProps<Props>();
   <RouterLink
     v-if="selectedAnime"
     :to="`/anime/${selectedAnime.mal_id}`"
-    class="bg-white rounded-xl shadow-lg hover:shadow-xl max-h-[450px] transition-shadow duration-300"
+    class="bg-white rounded-xl shadow-lg hover:shadow-xl max-h-[480px] transition-shadow duration-300"
   >
     <div class="relative aspect-[4/5] bg-primary-500/5">
       <img
