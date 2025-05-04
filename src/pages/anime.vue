@@ -6,6 +6,8 @@ import type { Anime } from "@/composables/anime";
 import Header from "@/components/Header.vue";
 import ContentTemplate from "@/components/ContentTemplate.vue";
 import Loading from "@/components/Loading.vue";
+import ArticleHeader from "@/components/ArticleHeader.vue";
+import TextareaComments from "@/components/TextareaComments.vue";
 
 interface Props {
   id: string;
@@ -92,11 +94,20 @@ watchEffect(() => {
         </div>
 
         <article>
-          <h2
+          <ArticleHeader
+            class="text-xl text-primary-500 mb-4 border-l-4 border-primary-500 pl-3"
+          >
+            Комментарий
+          </ArticleHeader>
+          <TextareaComments :id="id"></TextareaComments>
+        </article>
+
+        <article>
+          <ArticleHeader
             class="text-xl text-primary-500 mb-4 border-l-4 border-primary-500 pl-3"
           >
             Описание
-          </h2>
+          </ArticleHeader>
           <p class="text-black leading-relaxed">
             {{ selectedAnime.synopsis }}
           </p>

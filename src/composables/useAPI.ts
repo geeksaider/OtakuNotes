@@ -1,6 +1,7 @@
 import type { Ref } from "vue";
 
-const API_BASE = "https://api.jikan.moe/v4";
+const API_BASE = (type: string) =>
+  type == "api" ? "http://127.0.0.1:3007/" : "https://api.jikan.moe/v4";
 
 export type Fetcher = typeof useApi;
 
@@ -18,7 +19,8 @@ interface ApiResponse<T, B> {
 export async function useApi<T, B = any>(
   path: string,
   options: ApiOptions = {},
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
+  type: string = "jikan"
 ): Promise<ApiResponse<T, B>> {
   const { queryParams, ...fetchOptions } = options;
 
@@ -27,15 +29,16 @@ export async function useApi<T, B = any>(
   loading && (loading.value = true);
 
   const response = (await fetch(
-    `${API_BASE}${path}?${queryString}`,
+    `${API_BASE(type)}${path}?${queryString}`,
     fetchOptions
   ).catch((err) => console.error(`Ошибка загрузки данных: ${err}`)))!;
 
   const status = response.status;
-  const body =
-    response.headers.get("content-type") == "application/json"
-      ? await response.json()
-      : {};
+  const body = response.headers
+    .get("content-type")
+    ?.startsWith("application/json")
+    ? await response.json()
+    : {};
 
   loading && (loading.value = false);
 
