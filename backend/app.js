@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { dbPool } from "./db_connector.js";
+import checkReq from "./commentChecker.js";
 
 const app = express();
 
@@ -10,53 +11,18 @@ const PORT = 3007;
 
 app.post("/api/comments", (req, res) => {
   const { comment_text, anime_id, user_id } = req.body;
-  if (!comment_text || !anime_id || !user_id) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-  if (comment_text.length <= 0 || comment_text.length > 500) {
-    return res
-      .status(400)
-      .json({ error: "Comment text must be between 1 and 500 characters" });
-  }
-  if (anime_id <= 0 || user_id <= 0) {
-    return res.status(400).json({ error: "Invalid anime or user ID" });
-  }
+  checkReq(comment_text, anime_id, user_id);
 
   try {
     dbPool.query(
-      "SELECT * FROM Comments WHERE anime_id = ? AND user_id = ?",
-      [anime_id, user_id],
-      (error, results) => {
-        if (error) {
-          console.error("Error checking comment existence:", error);
+      "INSERT INTO Comments (comment_text, anime_id, user_id) VALUES (?, ?, ?)",
+      [comment_text, anime_id, user_id],
+      (insertError) => {
+        if (insertError) {
+          console.error("Error inserting comment:", insertError);
           return res.status(500).json({ error: "Database error" });
         }
-
-        if (results.length > 0) {
-          dbPool.query(
-            "UPDATE Comments SET comment_text = ? WHERE anime_id = ? AND user_id = ?",
-            [comment_text, anime_id, user_id],
-            (updateError) => {
-              if (updateError) {
-                console.error("Error updating comment:", updateError);
-                return res.status(500).json({ error: "Database error" });
-              }
-              res.status(200).json({ message: "Comment updated successfully" });
-            }
-          );
-        } else {
-          dbPool.query(
-            "INSERT INTO Comments (comment_text, anime_id, user_id) VALUES (?, ?, ?)",
-            [comment_text, anime_id, user_id],
-            (insertError) => {
-              if (insertError) {
-                console.error("Error inserting comment:", insertError);
-                return res.status(500).json({ error: "Database error" });
-              }
-              res.status(201).json({ message: "Comment added successfully" });
-            }
-          );
-        }
+        res.status(201).json({ message: "Comment added successfully" });
       }
     );
   } catch (error) {
@@ -88,6 +54,11 @@ app.get("/api/comments", (req, res) => {
     console.error("Error in GET /api/comments:", error);
     res.status(500).json({ error: "Server error" });
   }
+});
+
+app.put("/api/comments/:id", (req, res) => {
+  const { comment_text, anime_id, user_id } = req.body;
+  checkReq(comment_text, anime_id, user_id);
 });
 
 app.listen(PORT, () => {

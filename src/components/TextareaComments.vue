@@ -15,18 +15,6 @@ const textarea = ref<HTMLTextAreaElement | null>(null);
 const senderState = ref<Boolean>(true);
 const createdAt = ref<Date>();
 
-const formatDate = (date: Date) => {
-  return (
-    (date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()) +
-    "." +
-    (date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()) +
-    " " +
-    date.getHours() +
-    ":" +
-    date.getMinutes()
-  );
-};
-
 const getApiResponse = () => {
   useApi<string>(
     "api/comments",
@@ -47,14 +35,6 @@ const getApiResponse = () => {
   });
 };
 
-onMounted(() => {
-  getApiResponse();
-});
-
-const remainingChars = computed(
-  () => maxLength - (commentText.value ? commentText.value.length : 0)
-);
-
 const createComment = () => {
   useApi<string>(
     "api/comments",
@@ -73,10 +53,30 @@ const createComment = () => {
     "api"
   );
 };
+
+onMounted(() => {
+  getApiResponse();
+});
+
+const remainingChars = computed(
+  () => maxLength - (commentText.value ? commentText.value.length : 0)
+);
+
+const formatDate = (date: Date) => {
+  return (
+    (date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()) +
+    "." +
+    (date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()) +
+    " " +
+    date.getHours() +
+    ":" +
+    date.getMinutes()
+  );
+};
 </script>
 
 <template>
-  <div class="flex flex-col gap-5" v-if="senderState">
+  <section class="flex flex-col gap-5" v-if="senderState">
     <textarea
       v-model="commentText"
       placeholder="Введите ваш комментарий к аниме..."
@@ -95,11 +95,13 @@ const createComment = () => {
     >
       <span class="text-primary-500">Оставить комментарий</span>
     </PrimaryButton>
-  </div>
-  <div class="flex flex-col gap-5" v-else>
+  </section>
+  <section class="flex flex-col gap-5" v-else>
     <div class="flex justify-between items-center">
       <p class="text-black leading-relaxed pl-5">- {{ commentText }}</p>
-      <span class="text-xs text-stone-300">{{ formatDate(createdAt) }}</span>
+      <span class="text-xs text-stone-300">{{
+        createdAt ? formatDate(createdAt) : ""
+      }}</span>
     </div>
     <div class="flex items-center gap-4">
       <PrimaryButton @click="createComment" :disabled="!commentText.trim()">
@@ -109,5 +111,5 @@ const createComment = () => {
         <Delete class="fill-primary-500" />
       </PrimaryButton>
     </div>
-  </div>
+  </section>
 </template>
