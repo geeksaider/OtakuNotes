@@ -15,7 +15,7 @@ const maxLength: number = 500;
 const textarea = ref<HTMLTextAreaElement | null>(null);
 const senderState = ref<Boolean>(true);
 const createdAt = ref<Date>();
-const buttonType = ref<String>("creator");
+const buttonType = ref<string>("creator");
 
 const getApiResponse = () => {
   useApi<string>(
@@ -129,7 +129,7 @@ const disabled = computed(() => {
     <PrimaryButton
       @click="createComment"
       :disabled="disabled"
-      v-if="buttonType == 'creater'"
+      v-if="buttonType == 'creator'"
     >
       <span class="text-primary-500">Оставить комментарий</span>
     </PrimaryButton>
