@@ -99,7 +99,7 @@ watchEffect(() => {
           >
             Комментарий
           </ArticleHeader>
-          <TextareaComments :id="id"></TextareaComments>
+          <TextareaComments :id="id" :key="id"></TextareaComments>
         </article>
 
         <article>
@@ -153,7 +153,7 @@ watchEffect(() => {
                 v-for="genre in selectedAnime.genres"
                 :key="genre.mal_id"
                 :to="`/genre/${genre.mal_id}`"
-                class="px-3 py-1.5 text-sm bg-primary-300 text-primary-500 rounded-full hover:bg-primary-500/10 transition-colors"
+                class="px-3 py-1.5 text-sm bg-primary-300 text-primary-500 rounded-full hover:bg-primary-500/30 transition-colors"
               >
                 {{ genre.name }}
               </router-link>

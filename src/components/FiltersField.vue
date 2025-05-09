@@ -83,7 +83,7 @@ const reset = () => {
 };
 
 onMounted(() => {
-  window.onmousedown = () => (isActive.value = false);
+  window.addEventListener("mousedown", () => (isActive.value = false));
   document.onkeydown = (e) => {
     e.key == "Escape" && (isActive.value = false);
   };
