@@ -56,9 +56,27 @@ app.get("/api/comments", (req, res) => {
   }
 });
 
-app.put("/api/comments/:id", (req, res) => {
+app.put("/api/commentEditor", (req, res) => {
   const { comment_text, anime_id, user_id } = req.body;
   checkReq(comment_text, anime_id, user_id);
+  try {
+    dbPool.query(
+      "UPDATE Comments SET comment_text = ? , created_at = ? WHERE anime_id = ? AND user_id = ?",
+      [comment_text, new Date(), anime_id, user_id],
+      (error) => {
+        if (error) {
+          console.error("Error updating comment:", error);
+          return res.status(500).json({ error: "Database error" });
+        }
+        return res
+          .status(200)
+          .json({ message: "Comment updated successfully" });
+      }
+    );
+  } catch (error) {
+    console.error("Error in PUT /api/comments:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 app.listen(PORT, () => {

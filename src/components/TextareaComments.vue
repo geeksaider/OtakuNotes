@@ -9,11 +9,13 @@ interface Props {
 }
 
 const { id } = defineProps<Props>();
-const commentText = ref("");
-const maxLength = 500;
+const commentText = ref<string>("");
+let dbCommentText: string = "";
+const maxLength: number = 500;
 const textarea = ref<HTMLTextAreaElement | null>(null);
 const senderState = ref<Boolean>(true);
 const createdAt = ref<Date>();
+const buttonType = ref<String>("creator");
 
 const getApiResponse = () => {
   useApi<string>(
@@ -27,7 +29,8 @@ const getApiResponse = () => {
     undefined,
     "api"
   ).then(({ body }) => {
-    commentText.value = body[0].comment_text;
+    dbCommentText = body[0].comment_text;
+    commentText.value = dbCommentText;
     createdAt.value = new Date(body[0].created_at);
     commentText.value.length > 0
       ? (senderState.value = false)
@@ -35,8 +38,8 @@ const getApiResponse = () => {
   });
 };
 
-const createComment = () => {
-  useApi<string>(
+const createComment = async () => {
+  await useApi<string>(
     "api/comments",
     {
       method: "POST",
@@ -52,6 +55,27 @@ const createComment = () => {
     undefined,
     "api"
   );
+  getApiResponse();
+};
+
+const editComment = async () => {
+  await useApi<string>(
+    "api/commentEditor",
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        comment_text: commentText.value,
+        anime_id: id,
+        user_id: 1,
+      }),
+    },
+    undefined,
+    "api"
+  );
+  getApiResponse();
 };
 
 onMounted(() => {
@@ -66,13 +90,28 @@ const formatDate = (date: Date) => {
   return (
     (date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()) +
     "." +
-    (date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()) +
+    (() => {
+      const month = date.getMonth() + 1;
+      return month < 10 ? `0${month}` : month;
+    })() +
     " " +
     date.getHours() +
     ":" +
     date.getMinutes()
   );
 };
+
+const disabled = computed(() => {
+  if (
+    commentText.value.length > maxLength ||
+    !commentText.value.trim() ||
+    commentText.value === dbCommentText
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+});
 </script>
 
 <template>
@@ -87,13 +126,19 @@ const formatDate = (date: Date) => {
     <p class="text-sm text-black mt-1">
       {{ remainingChars }} символов осталось
     </p>
-
     <PrimaryButton
       @click="createComment"
-      :disabled="!commentText.trim()"
-      class="py-3 px-4 w-fit bg-background rounded-lg disabled:pointer-events-none disabled:opacity-60 hover:bg-primary-300/30 transition-colors border border-primary-500/10"
+      :disabled="disabled"
+      v-if="buttonType == 'creater'"
     >
       <span class="text-primary-500">Оставить комментарий</span>
+    </PrimaryButton>
+    <PrimaryButton
+      @click="editComment"
+      :disabled="disabled"
+      v-if="buttonType == 'editor'"
+    >
+      <span class="text-primary-500">Отредактировать!</span>
     </PrimaryButton>
   </section>
   <section class="flex flex-col gap-5" v-else>
@@ -104,7 +149,14 @@ const formatDate = (date: Date) => {
       }}</span>
     </div>
     <div class="flex items-center gap-4">
-      <PrimaryButton @click="createComment" :disabled="!commentText.trim()">
+      <PrimaryButton
+        @click="
+          () => {
+            senderState = true;
+            buttonType = 'editor';
+          }
+        "
+      >
         <span class="text-primary-500">Редактировать</span>
       </PrimaryButton>
       <PrimaryButton classes="bg-rose-100 hover:bg-rose-200">
