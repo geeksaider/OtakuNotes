@@ -79,7 +79,7 @@ app.put("/api/commentEditor", (req, res) => {
   }
 });
 
-app.delete("/api/comments", (req, res) => {
+app.delete("/api/commentDeleter", (req, res) => {
   const { anime_id, user_id } = req.body;
   if (isNaN(anime_id) || isNaN(user_id) || anime_id <= 0 || user_id <= 0) {
     return res.status(400).json({ error: "Invalid anime or user ID" });

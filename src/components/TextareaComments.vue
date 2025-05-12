@@ -42,61 +42,45 @@ const getApiResponse = () => {
 const responseStatus = ref<number>();
 const responseMessage = ref<string>("");
 
-const createComment = async () => {
-  await useApi<string>(
-    "api/comments",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+const createApiRequest = (
+  endpoint: string,
+  method: "POST" | "PUT" | "DELETE",
+  errorMessage: string = "Ошибка!!!"
+) => {
+  return async () => {
+    await useApi<string>(
+      endpoint,
+      {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          comment_text: commentText.value,
+          anime_id: id,
+          user_id: 1,
+        }),
       },
-      body: JSON.stringify({
-        comment_text: commentText.value,
-        anime_id: id,
-        user_id: 1,
-      }),
-    },
-    undefined,
-    "api"
-  ).then(({ status, response, body }) => {
-    if (response.ok) {
-      responseStatus.value = status;
-      responseMessage.value = body.message;
-    } else {
-      responseStatus.value = 900;
-      responseMessage.value = "Ошибка!!!";
-    }
-  });
-  getApiResponse();
+      undefined,
+      "api"
+    ).then(({ status, response, body }) => {
+      if (response.ok) {
+        responseStatus.value = status;
+        responseMessage.value = body.message;
+      } else {
+        responseStatus.value = 900;
+        responseMessage.value = errorMessage;
+      }
+    });
+    getApiResponse();
+  };
 };
 
-const editComment = async () => {
-  await useApi<string>(
-    "api/commentEditor",
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        comment_text: commentText.value,
-        anime_id: id,
-        user_id: 1,
-      }),
-    },
-    undefined,
-    "api"
-  ).then(({ status, response, body }) => {
-    if (response.ok) {
-      responseStatus.value = status;
-      responseMessage.value = body.message;
-    } else {
-      responseStatus.value = 900;
-      responseMessage.value = "Ошибка!!!";
-    }
-  });
-  getApiResponse();
-};
+const createComment = createApiRequest("api/comments", "POST");
+
+const editComment = createApiRequest("api/commentEditor", "PUT");
+
+const deleteComment = createApiRequest("api/commentDeleter", "DELETE");
 
 onMounted(() => {
   getApiResponse();
@@ -187,7 +171,10 @@ const disabled = computed(() => {
       >
         <span class="text-primary-500">Редактировать</span>
       </PrimaryButton>
-      <PrimaryButton classes="bg-rose-100 hover:bg-rose-200">
+      <PrimaryButton
+        classes="bg-rose-100 hover:bg-rose-200"
+        @click="deleteComment"
+      >
         <Delete class="fill-primary-500" />
       </PrimaryButton>
     </div>
