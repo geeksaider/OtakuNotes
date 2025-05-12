@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { useApi } from "@/composables/useAPI";
 import Delete from "@/components/SVG/Delete.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
+import ModalComment from "./ModalComment.vue";
 
 interface Props {
   id: string;
@@ -38,6 +39,9 @@ const getApiResponse = () => {
   });
 };
 
+const responseStatus = ref<number>();
+const responseMessage = ref<string>("");
+
 const createComment = async () => {
   await useApi<string>(
     "api/comments",
@@ -54,7 +58,15 @@ const createComment = async () => {
     },
     undefined,
     "api"
-  );
+  ).then(({ status, response, body }) => {
+    if (response.ok) {
+      responseStatus.value = status;
+      responseMessage.value = body.message;
+    } else {
+      responseStatus.value = 900;
+      responseMessage.value = "Ошибка!!!";
+    }
+  });
   getApiResponse();
 };
 
@@ -74,7 +86,15 @@ const editComment = async () => {
     },
     undefined,
     "api"
-  );
+  ).then(({ status, response, body }) => {
+    if (response.ok) {
+      responseStatus.value = status;
+      responseMessage.value = body.message;
+    } else {
+      responseStatus.value = 900;
+      responseMessage.value = "Ошибка!!!";
+    }
+  });
   getApiResponse();
 };
 
@@ -87,25 +107,33 @@ const remainingChars = computed(
 );
 
 const formatDate = (date: Date) => {
+  const formatNum = (num: number) => {
+    return num < 10 ? `0${num}` : num;
+  };
   return (
-    (date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()) +
+    formatNum(date.getDate()) +
     "." +
-    (() => {
-      const month = date.getMonth() + 1;
-      return month < 10 ? `0${month}` : month;
-    })() +
+    formatNum(date.getMonth() + 1) +
     " " +
-    date.getHours() +
+    formatNum(date.getHours()) +
     ":" +
-    date.getMinutes()
+    formatNum(date.getMinutes())
   );
+};
+
+const modelType = (state: number) => {
+  if (state >= 200 && state < 300) {
+    return "success";
+  } else {
+    return "error";
+  }
 };
 
 const disabled = computed(() => {
   if (
     commentText.value.length > maxLength ||
     !commentText.value.trim() ||
-    commentText.value === dbCommentText
+    commentText.value == dbCommentText
   ) {
     return true;
   } else {
@@ -164,4 +192,7 @@ const disabled = computed(() => {
       </PrimaryButton>
     </div>
   </section>
+  <ModalComment :type="modelType(responseStatus)" v-if="responseStatus">
+    >{{ responseStatus }} {{ responseMessage }}</ModalComment
+  >
 </template>

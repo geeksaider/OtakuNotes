@@ -79,6 +79,32 @@ app.put("/api/commentEditor", (req, res) => {
   }
 });
 
+app.delete("/api/comments", (req, res) => {
+  const { anime_id, user_id } = req.body;
+  if (isNaN(anime_id) || isNaN(user_id) || anime_id <= 0 || user_id <= 0) {
+    return res.status(400).json({ error: "Invalid anime or user ID" });
+  }
+
+  try {
+    dbPool.query(
+      "DELETE FROM Comments WHERE anime_id = ? AND user_id = ?",
+      [anime_id, user_id],
+      (error) => {
+        if (error) {
+          console.error("Error deleting comment:", error);
+          return res.status(500).json({ error: "Database error" });
+        }
+        return res
+          .status(200)
+          .json({ message: "Comment deleted successfully" });
+      }
+    );
+  } catch (error) {
+    console.error("Error in DELETE /api/comments:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
