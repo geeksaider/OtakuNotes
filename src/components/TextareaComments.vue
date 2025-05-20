@@ -30,12 +30,14 @@ const getApiResponse = () => {
     undefined,
     "api"
   ).then(({ body }) => {
-    dbCommentText = body[0].comment_text;
-    commentText.value = dbCommentText;
-    createdAt.value = new Date(body[0].created_at);
-    commentText.value.length > 0
-      ? (senderState.value = false)
-      : (senderState.value = true);
+    if (body.length > 0) {
+      dbCommentText = body[0].comment_text;
+      commentText.value = dbCommentText;
+      createdAt.value = new Date(body[0].created_at);
+      senderState.value = false;
+    } else {
+      senderState.value = true;
+    }
   });
 };
 
@@ -48,6 +50,8 @@ const createApiRequest = (
   errorMessage: string = "Ошибка!!!"
 ) => {
   return async () => {
+    responseStatus.value = undefined;
+
     await useApi<string>(
       endpoint,
       {
@@ -80,7 +84,10 @@ const createComment = createApiRequest("api/comments", "POST");
 
 const editComment = createApiRequest("api/commentEditor", "PUT");
 
-const deleteComment = createApiRequest("api/commentDeleter", "DELETE");
+const deleteComment = () => {
+  createApiRequest("api/commentDeleter", "DELETE")();
+  commentText.value = "";
+};
 
 onMounted(() => {
   getApiResponse();
@@ -180,6 +187,6 @@ const disabled = computed(() => {
     </div>
   </section>
   <ModalComment :type="modelType(responseStatus)" v-if="responseStatus">
-    >{{ responseStatus }} {{ responseMessage }}</ModalComment
+    {{ responseStatus }} {{ responseMessage }}</ModalComment
   >
 </template>
