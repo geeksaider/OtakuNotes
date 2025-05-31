@@ -8,6 +8,7 @@ import ContentTemplate from "@/components/ContentTemplate.vue";
 import Loading from "@/components/Loading.vue";
 import ArticleHeader from "@/components/ArticleHeader.vue";
 import TextareaComments from "@/components/TextareaComments.vue";
+import WatchingState from "@/components/WatchingState.vue";
 
 interface Props {
   id: string;
@@ -92,6 +93,8 @@ watchEffect(() => {
             </div>
           </div>
         </div>
+
+        <WatchingState :id="id" :total-episodes="selectedAnime.episodes" />
 
         <article>
           <ArticleHeader
