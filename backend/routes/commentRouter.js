@@ -4,28 +4,6 @@ const router = express.Router();
 import { dbPool } from "../db_connector.js";
 import checkReq from "../commentChecker.js";
 
-router.post("/", (req, res) => {
-  const { comment_text, anime_id, user_id } = req.body;
-  checkReq(comment_text, anime_id, user_id);
-
-  try {
-    dbPool.query(
-      "INSERT INTO Comments (comment_text, anime_id, user_id) VALUES (?, ?, ?)",
-      [comment_text, anime_id, user_id],
-      (insertError) => {
-        if (insertError) {
-          console.error("Error inserting comment:", insertError);
-          return res.status(500).json({ error: "Database error" });
-        }
-        res.status(201).json({ message: "Comment added successfully" });
-      }
-    );
-  } catch (error) {
-    console.error("Error in POST /api/comments:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 router.get("/", (req, res) => {
   const anime_id = req.query.anime_id;
   const user_id = req.query.user_id;
@@ -47,6 +25,28 @@ router.get("/", (req, res) => {
     );
   } catch (error) {
     console.error("Error in GET /api/comments:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post("/", (req, res) => {
+  const { comment_text, anime_id, user_id } = req.body;
+  checkReq(comment_text, anime_id, user_id);
+
+  try {
+    dbPool.query(
+      "INSERT INTO Comments (comment_text, anime_id, user_id) VALUES (?, ?, ?)",
+      [comment_text, anime_id, user_id],
+      (insertError) => {
+        if (insertError) {
+          console.error("Error inserting comment:", insertError);
+          return res.status(500).json({ error: "Database error" });
+        }
+        res.status(201).json({ message: "Comment added successfully" });
+      }
+    );
+  } catch (error) {
+    console.error("Error in POST /api/comments:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
