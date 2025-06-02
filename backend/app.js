@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-const commentRouter = require("./routes/commentRouter.js");
-const scoreRouter = require("./routes/scoreRouter.js");
-const titleStateRouter = require("./routes/stateRouter.js");
-const progressRouter = require("./routes/progressRouter.js");
+import commentRouter from "./routes/commentRouter.js";
+import scoreRouter from "./routes/scoreRouter.js";
+import titleStateRouter from "./routes/scoreRouter.js";
+import progressRouter from "./routes/progressRouter.js";
 
 app.use(express.json(), cors());
 app.use("/api/comments", commentRouter);

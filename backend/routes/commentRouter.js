@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 import { dbPool } from "../db_connector.js";
 import checkReq from "../commentChecker.js";
 
 router.get("/", (req, res) => {
-  const anime_id = req.query.anime_id;
-  const user_id = req.query.user_id;
+  const { anime_id, user_id } = req.query;
+
   if (isNaN(anime_id) || isNaN(user_id) || anime_id <= 0 || user_id <= 0) {
     return res.status(400).json({ error: "Invalid anime or user ID" });
   }
@@ -100,4 +100,4 @@ router.delete("/", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
